@@ -32,3 +32,6 @@ echo "Using heap size: $heapsize"
 
 export java_opts="-Xmx${heapsize}m -Xms${heapsize}m -XX:+UseConcMarkSweepGC"
 
+export platform="neo4j"
+export platform_classpath=
+
