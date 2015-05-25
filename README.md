@@ -1,4 +1,4 @@
-# Neo4j Giraph platform extension
+# Graphalytics Neo4j platform extension
 
 
 ## Getting started
