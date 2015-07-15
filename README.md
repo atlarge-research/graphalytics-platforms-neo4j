@@ -1,5 +1,7 @@
 # Graphalytics Neo4j platform extension
 
+[![Build Status](http://jenkins.tribler.org/buildStatus/icon?job=Graphalytics_Neo4j_master_tester)](http://jenkins.tribler.org/job/Graphalytics_Neo4j_master_tester/)
+
 
 ## Getting started
 
