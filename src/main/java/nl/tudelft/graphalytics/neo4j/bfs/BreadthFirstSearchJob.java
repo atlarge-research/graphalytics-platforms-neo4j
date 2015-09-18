@@ -43,7 +43,7 @@ public class BreadthFirstSearchJob extends Neo4jJob {
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph).run();
+		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph.getGraphFormat().isDirected()).run();
 	}
 
 }

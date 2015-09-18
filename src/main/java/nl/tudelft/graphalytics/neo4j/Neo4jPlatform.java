@@ -47,7 +47,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.EDGE;
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;

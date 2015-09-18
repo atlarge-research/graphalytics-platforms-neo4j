@@ -15,8 +15,6 @@
  */
 package nl.tudelft.graphalytics.neo4j.bfs;
 
-import nl.tudelft.graphalytics.domain.Graph;
-import nl.tudelft.graphalytics.domain.GraphFormat;
 import nl.tudelft.graphalytics.neo4j.AbstractComputationTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,33 +37,16 @@ public class BreadthFirstSearchComputationTest extends AbstractComputationTest {
 
 	private static final Long BFS_START_NODE = 1L;
 
+	// TODO: Fix tests for BFS
+
 	@Test
 	public void testExample() throws IOException {
 		// Load data
 		loadGraphFromResource("/test-examples/bfs-input");
-		String name = "n/a";
-		String filePath = "n/a";
-		boolean edgeBased = true; // n/a
-		long numberOfVertices = -1; // n/a
-		long numberOfEdges = -1; // n/a
-		Graph directedGraph = new Graph(
-				name,
-				filePath,
-				new GraphFormat(true, edgeBased),
-				numberOfVertices,
-				numberOfEdges
-		);
-		Graph undirectedGraph = new Graph(
-				name,
-				filePath,
-				new GraphFormat(false, edgeBased),
-				numberOfVertices,
-				numberOfEdges
-		);
 
 		// Execute algorithm
-		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, directedGraph));
-		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, undirectedGraph));
+		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, true));
+		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, false));
 	}
 
 	private void runBreadthFirstSearchComputation(BreadthFirstSearchComputation computation) throws IOException {
