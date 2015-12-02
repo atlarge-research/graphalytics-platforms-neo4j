@@ -15,66 +15,58 @@
  */
 package nl.tudelft.graphalytics.neo4j.bfs;
 
-import nl.tudelft.graphalytics.neo4j.AbstractComputationTest;
-import org.junit.Assert;
-import org.junit.Test;
+import nl.tudelft.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
+import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
+import nl.tudelft.graphalytics.validation.GraphStructure;
+import nl.tudelft.graphalytics.validation.bfs.BreadthFirstSearchOutput;
+import nl.tudelft.graphalytics.validation.bfs.BreadthFirstSearchValidationTest;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
+import static nl.tudelft.graphalytics.neo4j.bfs.BreadthFirstSearchComputation.DISTANCE;
 
 /**
  * Test case for the breadth-first search implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
-public class BreadthFirstSearchComputationTest extends AbstractComputationTest {
+public class BreadthFirstSearchComputationTest extends BreadthFirstSearchValidationTest {
 
-	private static final Long BFS_START_NODE = 1L;
-
-	// TODO: Fix tests for BFS
-
-	@Test
-	public void testExample() throws IOException {
-		// Load data
-		loadGraphFromResource("/test-examples/bfs-input");
-
-		// Execute algorithm
-		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, true));
-		runBreadthFirstSearchComputation(new BreadthFirstSearchComputation(graphDatabase, BFS_START_NODE, false));
+	@Override
+	public BreadthFirstSearchOutput executeDirectedBreadthFirstSearch(GraphStructure graph,
+			BreadthFirstSearchParameters parameters) throws Exception {
+		return executeBreadthFirstSearch(graph, parameters, true);
 	}
 
-	private void runBreadthFirstSearchComputation(BreadthFirstSearchComputation computation) throws IOException {
-		// Execute algorithm
-		computation.run();
-		// Verify output
-		Map<Long, Long> expectedOutput = parseOutputResource("/test-examples/bfs-output");
-		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (long vertexId : expectedOutput.keySet()) {
-				long distance = (long) getNode(vertexId).getProperty(BreadthFirstSearchComputation.DISTANCE,
-						Long.MAX_VALUE);
-				Assert.assertThat("incorrect distance computed for id " + vertexId,
-						distance, is(expectedOutput.get(vertexId)));
-			}
-		}
+	@Override
+	public BreadthFirstSearchOutput executeUndirectedBreadthFirstSearch(GraphStructure graph,
+			BreadthFirstSearchParameters parameters) throws Exception {
+		return executeBreadthFirstSearch(graph, parameters, true);
 	}
 
-	private static Map<Long, Long> parseOutputResource(String resourceName) throws IOException {
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				BreadthFirstSearchComputationTest.class.getResourceAsStream(resourceName)))) {
-			Map<Long, Long> expectedOutput = new HashMap<>();
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				String[] tokens = line.split(" ");
-				expectedOutput.put(Long.parseLong(tokens[0]), Long.parseLong(tokens[1]));
+	private BreadthFirstSearchOutput executeBreadthFirstSearch(GraphStructure graph,
+			BreadthFirstSearchParameters parameters, boolean directed) {
+		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
+		new BreadthFirstSearchComputation(database, parameters.getSourceVertex(), directed).run();
+
+		Map<Long, Long> output = new HashMap<>();
+		try (Transaction ignored = database.beginTx()) {
+			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+				if (node.hasProperty(DISTANCE)) {
+					output.put((long)node.getProperty(ID_PROPERTY), (long)node.getProperty(DISTANCE));
+				} else {
+					output.put((long)node.getProperty(ID_PROPERTY), Long.MAX_VALUE);
+				}
 			}
-			return expectedOutput;
 		}
+		database.shutdown();
+		return new BreadthFirstSearchOutput(output);
 	}
 
 }
