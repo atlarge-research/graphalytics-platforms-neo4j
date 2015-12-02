@@ -15,64 +15,53 @@
  */
 package nl.tudelft.graphalytics.neo4j.stats;
 
-import nl.tudelft.graphalytics.neo4j.AbstractComputationTest;
+import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
 import nl.tudelft.graphalytics.neo4j.stats.LocalClusteringCoefficientComputation.LocalClusteringCoefficientResult;
-import org.junit.Test;
+import nl.tudelft.graphalytics.validation.GraphStructure;
+import nl.tudelft.graphalytics.validation.stats.LocalClusteringCoefficientOutput;
+import nl.tudelft.graphalytics.validation.stats.LocalClusteringCoefficientValidationTest;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
+import static nl.tudelft.graphalytics.neo4j.stats.LocalClusteringCoefficientComputation.LCC;
 
 /**
  * Test case for the connected components implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
-public class LocalClusteringCoefficientComputationTest extends AbstractComputationTest {
+public class LocalClusteringCoefficientComputationTest extends LocalClusteringCoefficientValidationTest {
 
-	private static final long GLOBAL_ID = Long.MIN_VALUE;
-	private static final double ERROR_BOUND = 1e-4;
-
-	@Test
-	public void testExample() throws IOException {
-		// Load data
-		loadGraphFromResource("/test-examples/stats-input");
-		// Execute algorithm
-		LocalClusteringCoefficientResult result = new LocalClusteringCoefficientComputation(graphDatabase).run();
-		// Verify output
-		Map<Long, Double> expectedOutput = parseOutputResource("/test-examples/stats-output");
-		assertThat("incorrect mean LCC",
-				result.getMeanLcc(), is(closeTo(expectedOutput.remove(GLOBAL_ID), ERROR_BOUND)));
-		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (long vertexId : expectedOutput.keySet()) {
-				double clusteringCoefficient = (double) getNode(vertexId).getProperty(
-						LocalClusteringCoefficientComputation.LCC, Double.NaN);
-				double expectedClusteringCoefficient = expectedOutput.get(vertexId);
-				assertThat("incorrect clustering coefficient computed for id " + vertexId,
-						clusteringCoefficient, is(closeTo(expectedClusteringCoefficient, ERROR_BOUND)));
-			}
-		}
+	@Override
+	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph)
+			throws Exception {
+		return executeLocalClusteringCoefficient(graph);
 	}
 
-	private Map<Long, Double> parseOutputResource(String resourceName) throws IOException {
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				LocalClusteringCoefficientComputationTest.class.getResourceAsStream(resourceName)))) {
-			Map<Long, Double> expectedOutput = new HashMap<>();
-			expectedOutput.put(GLOBAL_ID, Double.parseDouble(bufferedReader.readLine()));
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				String[] tokens = line.split(" ");
-				expectedOutput.put(Long.parseLong(tokens[0]), Double.parseDouble(tokens[1]));
+	@Override
+	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph)
+			throws Exception {
+		return executeLocalClusteringCoefficient(graph);
+	}
+
+	private LocalClusteringCoefficientOutput executeLocalClusteringCoefficient(GraphStructure graph) {
+		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
+		LocalClusteringCoefficientResult result = new LocalClusteringCoefficientComputation(database).run();
+
+		Map<Long, Double> output = new HashMap<>();
+		try (Transaction ignored = database.beginTx()) {
+			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+				output.put((long)node.getProperty(ID_PROPERTY), (double)node.getProperty(LCC));
 			}
-			return expectedOutput;
 		}
+		database.shutdown();
+		return new LocalClusteringCoefficientOutput(output, result.getMeanLcc());
 	}
 
 }
