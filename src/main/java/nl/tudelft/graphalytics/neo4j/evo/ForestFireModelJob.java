@@ -43,7 +43,7 @@ public class ForestFireModelJob extends Neo4jJob {
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new ForestFireModelComputation(graphDatabase, parameters);
+		new ForestFireModelComputation(graphDatabase, parameters, graph.getGraphFormat().isDirected());
 	}
 
 }
