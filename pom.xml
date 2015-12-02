@@ -151,6 +151,9 @@
 						<exclude>src/main/resources/**</exclude>
 						<exclude>config-template/**</exclude>
 					</excludes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
 				</configuration>
 				<executions>
 					<execution>
