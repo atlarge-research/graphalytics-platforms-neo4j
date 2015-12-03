@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Delft University of Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,14 @@
  */
 package nl.tudelft.graphalytics.neo4j;
 
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import nl.tudelft.graphalytics.Platform;
 import nl.tudelft.graphalytics.PlatformExecutionException;
-import nl.tudelft.graphalytics.domain.*;
+import nl.tudelft.graphalytics.domain.Algorithm;
+import nl.tudelft.graphalytics.domain.Graph;
+import nl.tudelft.graphalytics.domain.NestedConfiguration;
+import nl.tudelft.graphalytics.domain.PlatformBenchmarkResult;
 import nl.tudelft.graphalytics.neo4j.bfs.BreadthFirstSearchJob;
 import nl.tudelft.graphalytics.neo4j.cd.CommunityDetectionJob;
 import nl.tudelft.graphalytics.neo4j.conn.ConnectedComponentsJob;
@@ -29,21 +34,21 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.schema.IndexDefinition;
-import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.graphdb.Label;
+import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.InputMismatchException;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
-import static java.lang.String.format;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.EDGE;
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
 
@@ -86,116 +91,86 @@ public class Neo4jPlatform implements Platform {
 			neo4jConfig = new PropertiesConfiguration(PROPERTIES_FILENAME);
 		} catch (ConfigurationException e) {
 			// Fall-back to an empty properties file
-			LOG.info(format("Could not find or load %s", PROPERTIES_FILENAME));
+			LOG.info("Could not find or load \"{}\"", PROPERTIES_FILENAME);
 			neo4jConfig = new PropertiesConfiguration();
 		}
 		dbPath = neo4jConfig.getString(DB_PATH_KEY, DB_PATH);
 	}
 
-	// TODO rewrite this
 	@Override
-	public void uploadGraph(Graph graph, String graphFilePath) throws Exception {
-		URL properties = getClass().getResource(PROPERTIES_PATH);
+	public void uploadGraph(Graph graph) throws Exception {
+		LOG.info("Importing graph \"{}\" into a Neo4j database", graph.getName());
+
 		String databasePath = Paths.get(dbPath, graph.getName()).toString();
-		try (Neo4jDatabase db = new Neo4jDatabase(databasePath, properties);
-			 BufferedReader graphData = new BufferedReader(new FileReader(graphFilePath));
-			 Neo4jDatabaseImporter importer = new Neo4jDatabaseImporter(db.get(), TRANSACTION_SIZE)) {
-			createIndexOnVertexId(db.get());
 
-			GraphFormat gf = graph.getGraphFormat();
-			if (gf.isEdgeBased()) {
-				parseEdgeBasedGraph(graphData, importer, gf.isDirected());
-			} else {
-				parseVertexBasedGraph(graphData, importer);
-			}
-		}
-	}
+		InputStream propertiesStream = getClass().getResourceAsStream(PROPERTIES_PATH);
+		Map<String, String> properties = MapUtil.load(propertiesStream);
+		BatchInserter inserter = BatchInserters.inserter(databasePath, properties);
 
-	private static void createIndexOnVertexId(GraphDatabaseService db) {
-		IndexDefinition indexDefinition;
-		try (Transaction tx = db.beginTx()) {
-			indexDefinition = db.schema().indexFor(Vertex).on(ID_PROPERTY).create();
-			tx.success();
-		}
+		LOG.debug("- Inserting vertices");
 
-		boolean indexIsOnline = false;
-		while (!indexIsOnline) {
-			try (Transaction tx = db.beginTx()) {
-				db.schema().awaitIndexOnline(indexDefinition, INDEX_WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-				indexIsOnline = true;
-				tx.success();
-			} catch (IllegalStateException e) {
-				if (db.schema().getIndexState(indexDefinition) == Schema.IndexState.FAILED) {
-					throw e;
+		Long2LongMap vertexIdMap = new Long2LongOpenHashMap((int)graph.getNumberOfVertices());
+		try (BufferedReader vertexData = new BufferedReader(new FileReader(graph.getVertexFilePath()))) {
+			Map<String, Object> propertiesCache = new HashMap<>(1, 1.0f);
+			for (String vertexLine = vertexData.readLine(); vertexLine != null; vertexLine = vertexData.readLine()) {
+				if (vertexLine.isEmpty()) {
+					continue;
 				}
+
+				long vertexId = Long.parseLong(vertexLine);
+				propertiesCache.put(ID_PROPERTY, vertexId);
+				long internalVertexId = inserter.createNode(propertiesCache, (Label)Vertex);
+				vertexIdMap.put(vertexId, internalVertexId);
 			}
 		}
-	}
 
-	private static void parseEdgeBasedGraph(BufferedReader graphData, Neo4jDatabaseImporter importer,
-			boolean isDirected) throws IOException {
-		String line;
-		while ((line = graphData.readLine()) != null) {
-			Scanner lineTokens = new Scanner(line);
-			// Skip empty lines
-			if (!lineTokens.hasNext()) {
-				continue;
-			}
+		LOG.debug("- Inserting edges");
 
-			// Read source and destination ID
-			long sourceId = lineTokens.nextLong();
-			long destinationId = lineTokens.nextLong();
-			// Perform a sanity check
-			if (lineTokens.hasNext()) {
-				throw new InputMismatchException("Expected two node IDs, found \"" + line + "\".");
-			}
+		try (BufferedReader edgeData = new BufferedReader(new FileReader(graph.getEdgeFilePath()))) {
+			for (String edgeLine = edgeData.readLine(); edgeLine != null; edgeLine = edgeData.readLine()) {
+				if (edgeLine.isEmpty()) {
+					continue;
+				}
 
-			// Create the edge
-			importer.createEdge(sourceId, destinationId);
-			if (!isDirected) {
-				importer.createEdge(destinationId, sourceId);
+				String[] edgeLineChunks = edgeLine.split(" ");
+				if (edgeLineChunks.length != 2) {
+					throw new IOException("Invalid data found in edge list: \"" + edgeLine + "\"");
+				}
+
+				inserter.createRelationship(vertexIdMap.get(Long.parseLong(edgeLineChunks[0])),
+						vertexIdMap.get(Long.parseLong(edgeLineChunks[1])), EDGE, null);
 			}
 		}
-	}
 
-	private void parseVertexBasedGraph(BufferedReader graphData, Neo4jDatabaseImporter importer) throws IOException {
-		String line;
-		while ((line = graphData.readLine()) != null) {
-			Scanner lineTokens = new Scanner(line);
-			// Skip empty lines
-			if (!lineTokens.hasNext()) {
-				continue;
-			}
+		inserter.createDeferredSchemaIndex(Vertex).on(ID_PROPERTY).create();
 
-			// Read the source vertex
-			long sourceId = lineTokens.nextLong();
+		inserter.shutdown();
 
-			// Read any number of destination IDs
-			while (lineTokens.hasNext()) {
-				long destinationId = lineTokens.nextLong();
-
-				// Create the edge
-				importer.createEdge(sourceId, destinationId);
-			}
-		}
+		LOG.debug("- Graph \"{}\" imported successfully", graph.getName());
 	}
 
 	@Override
 	public PlatformBenchmarkResult executeAlgorithmOnGraph(Algorithm algorithm, Graph graph, Object parameters)
 			throws PlatformExecutionException {
+		LOG.info("Executing algorithm \"{}\" on graph \"{}\"", algorithm.getName(), graph.getName());
+
 		// Create a copy of the database that is used to store the algorithm results
+		LOG.debug("- Creating working copy of graph database");
 		String graphDbPath = Paths.get(dbPath, graph.getName()).toString();
 		String graphDbCopyPath = Paths.get(dbPath, graph.getName() + "-" + algorithm).toString();
 		copyDatabase(graphDbPath, graphDbCopyPath);
 
 		// Execute the algorithm
 		try {
+			LOG.debug("- Starting Neo4j job");
 			Neo4jJob job = createJob(graphDbCopyPath, algorithm, parameters);
 			job.run(graph);
 		} finally {
 			// Clean up the database copy
 			deleteDatabase(graphDbCopyPath);
 		}
+
+		LOG.debug("- Successfully completed algorithm");
 
 		return new PlatformBenchmarkResult(NestedConfiguration.empty());
 	}
@@ -215,7 +190,7 @@ public class Neo4jPlatform implements Platform {
 			case STATS:
 				return new LocalClusteringCoefficientJob(databasePath, properties);
 			default:
-				throw new PlatformExecutionException("Algorithm not supported: " + algorithm);
+				throw new PlatformExecutionException("Algorithm \"" + algorithm + "\" not supported");
 		}
 	}
 
@@ -223,7 +198,7 @@ public class Neo4jPlatform implements Platform {
 		try {
 			FileUtils.copyDirectory(Paths.get(sourcePath).toFile(), Paths.get(destinationPath).toFile());
 		} catch (IOException ex) {
-			throw new PlatformExecutionException("Unable to create a temporary copy of the graph database", ex);
+			throw new PlatformExecutionException("Unable to create a temporary copy of the graph database:", ex);
 		}
 	}
 
@@ -231,16 +206,18 @@ public class Neo4jPlatform implements Platform {
 		try {
 			FileUtils.deleteDirectory(Paths.get(databasePath).toFile());
 		} catch (IOException e) {
-			throw new PlatformExecutionException("Unable to clean up the graph database", e);
+			throw new PlatformExecutionException("Unable to clean up the graph database:", e);
 		}
 	}
 
 	@Override
 	public void deleteGraph(String graphName) {
+		LOG.info("Cleaning up graph \"{}\"", graphName);
+
 		try {
 			deleteDatabase(Paths.get(dbPath, graphName).toString());
 		} catch (PlatformExecutionException e) {
-			LOG.error("Failed to clean up the graph database at " + Paths.get(dbPath, graphName).toString() + ".", e);
+			LOG.error("Failed to clean up the graph database at \"" + Paths.get(dbPath, graphName).toString() + "\":", e);
 		}
 	}
 

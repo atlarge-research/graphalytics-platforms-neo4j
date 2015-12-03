@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Delft University of Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,56 +15,50 @@
  */
 package nl.tudelft.graphalytics.neo4j.conn;
 
-import nl.tudelft.graphalytics.neo4j.AbstractComputationTest;
-import org.junit.Assert;
-import org.junit.Test;
+import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
+import nl.tudelft.graphalytics.validation.GraphStructure;
+import nl.tudelft.graphalytics.validation.conn.ConnectedComponentsOutput;
+import nl.tudelft.graphalytics.validation.conn.ConnectedComponentsValidationTest;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
+import static nl.tudelft.graphalytics.neo4j.conn.ConnectedComponentsComputation.COMPONENT;
 
 /**
  * Test case for the connected components implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
-public class ConnectedComponentsComputationTest extends AbstractComputationTest {
+public class ConnectedComponentsComputationTest extends ConnectedComponentsValidationTest {
 
-	@Test
-	public void testExample() throws IOException {
-		// Load data
-		loadGraphFromResource("/test-examples/conn-input");
-		// Execute algorithm
-		new ConnectedComponentsComputation(graphDatabase).run();
-		// Verify output
-		Map<Long, Long> expectedOutput = parseOutputResource("/test-examples/conn-output");
-		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (long vertexId : expectedOutput.keySet()) {
-				long component = (long)getNode(vertexId).getProperty(ConnectedComponentsComputation.COMPONENT,
-						Long.MAX_VALUE);
-				long expectedComponent = expectedOutput.get(vertexId);
-				Assert.assertThat("incorrect component computed for id " + vertexId,
-						component, is(expectedComponent));
-			}
-		}
+	@Override
+	public ConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws Exception {
+		return executeConnectedComponents(graph);
 	}
 
-	private static Map<Long, Long> parseOutputResource(String resourceName) throws IOException {
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-				ConnectedComponentsComputationTest.class.getResourceAsStream(resourceName)))) {
-			Map<Long, Long> expectedOutput = new HashMap<>();
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				String[] tokens = line.split(" ");
-				expectedOutput.put(Long.parseLong(tokens[0]), Long.parseLong(tokens[1]));
+	@Override
+	public ConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws Exception {
+		return executeConnectedComponents(graph);
+	}
+
+	private ConnectedComponentsOutput executeConnectedComponents(GraphStructure graph) {
+		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
+		new ConnectedComponentsComputation(database).run();
+
+		Map<Long, Long> output = new HashMap<>();
+		try (Transaction ignored = database.beginTx()) {
+			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+				output.put((long)node.getProperty(ID_PROPERTY), (long)node.getProperty(COMPONENT));
 			}
-			return expectedOutput;
 		}
+		database.shutdown();
+		return new ConnectedComponentsOutput(output);
 	}
 
 }

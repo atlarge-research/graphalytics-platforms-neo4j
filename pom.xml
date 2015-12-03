@@ -27,6 +27,12 @@
 			<artifactId>graphalytics-core</artifactId>
 			<version>${graphalytics.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>nl.tudelft.graphalytics</groupId>
+			<artifactId>graphalytics-validation</artifactId>
+			<version>${graphalytics.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -51,6 +57,11 @@
 			<version>${neo4j.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>7.0.7</version>
 		</dependency>
 
 		<dependency>
@@ -140,6 +151,9 @@
 						<exclude>src/main/resources/**</exclude>
 						<exclude>config-template/**</exclude>
 					</excludes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
 				</configuration>
 				<executions>
 					<execution>

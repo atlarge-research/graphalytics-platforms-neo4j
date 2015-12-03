@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Delft University of Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ public class BreadthFirstSearchJob extends Neo4jJob {
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph).run();
+		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph.getGraphFormat().isDirected()).run();
 	}
 
 }

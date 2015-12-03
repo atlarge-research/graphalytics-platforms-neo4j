@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2015 Delft University of Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,15 +32,19 @@ public class ForestFireModelComputation {
 	public static final String INITIAL_VERTEX = "INITVERTEX";
 	private final GraphDatabaseService graphDatabase;
 	private final ForestFireModelParameters parameters;
+	private final boolean directedGraph;
 	private final Random random;
 
 	/**
 	 * @param graphDatabase graph database representing the input graph
 	 * @param parameters    parameters for the forest fire model
+	 * @param directedGraph true iff the input graph is directed
 	 */
-	public ForestFireModelComputation(GraphDatabaseService graphDatabase, ForestFireModelParameters parameters) {
+	public ForestFireModelComputation(GraphDatabaseService graphDatabase, ForestFireModelParameters parameters,
+			boolean directedGraph) {
 		this.graphDatabase = graphDatabase;
 		this.parameters = parameters;
+		this.directedGraph = directedGraph;
 		this.random = new Random();
 	}
 
@@ -70,22 +74,27 @@ public class ForestFireModelComputation {
 		for (int distance = 0; distance < parameters.getMaxIterations(); distance++) {
 			Set<Node> newBurningVertices = new HashSet<>();
 			for (Node burningVertex : burningVertices) {
-				selectOutLinks(burningVertex, burntVertices, newBurningVertices);
-				selectInLinks(burningVertex, burntVertices, newBurningVertices);
+				selectOutLinks(newVertex, burningVertex, burntVertices, newBurningVertices);
+				selectInLinks(newVertex, burningVertex, burntVertices, newBurningVertices);
 			}
 			for (Node newBurningVertex : newBurningVertices) {
 				newVertex.createRelationshipTo(newBurningVertex, Neo4jConfiguration.EDGE);
+				if (!directedGraph) {
+					newBurningVertex.createRelationshipTo(newVertex, Neo4jConfiguration.EDGE);
+				}
 			}
 			burntVertices.addAll(newBurningVertices);
 			burningVertices = newBurningVertices;
 		}
 	}
 
-	private void selectOutLinks(Node burningVertex, Set<Node> burntVertices, Set<Node> newBurningVertices) {
+	private void selectOutLinks(Node newVertex, Node burningVertex, Set<Node> burntVertices,
+			Set<Node> newBurningVertices) {
 		int count = randomGeometric(parameters.getPRatio());
 		List<Node> eligibleNeighbours = new ArrayList<>();
 		for (Relationship edge : burningVertex.getRelationships(Neo4jConfiguration.EDGE, Direction.OUTGOING)) {
-			if (!burntVertices.contains(edge.getEndNode()) && !newBurningVertices.contains(edge.getEndNode())) {
+			if (edge.getEndNode().getId() != newVertex.getId() && !burntVertices.contains(edge.getEndNode()) &&
+					!newBurningVertices.contains(edge.getEndNode())) {
 				eligibleNeighbours.add(edge.getEndNode());
 			}
 		}
@@ -93,11 +102,13 @@ public class ForestFireModelComputation {
 		newBurningVertices.addAll(eligibleNeighbours.subList(0, Math.min(count, eligibleNeighbours.size())));
 	}
 
-	private void selectInLinks(Node burningVertex, Set<Node> burntVertices, Set<Node> newBurningVertices) {
+	private void selectInLinks(Node newVertex, Node burningVertex, Set<Node> burntVertices,
+			Set<Node> newBurningVertices) {
 		int count = randomGeometric(parameters.getRRatio());
 		List<Node> eligibleNeighbours = new ArrayList<>();
 		for (Relationship edge : burningVertex.getRelationships(Neo4jConfiguration.EDGE, Direction.INCOMING)) {
-			if (!burntVertices.contains(edge.getEndNode()) && !newBurningVertices.contains(edge.getEndNode())) {
+			if (edge.getEndNode().getId() != newVertex.getId() && !burntVertices.contains(edge.getEndNode()) &&
+					!newBurningVertices.contains(edge.getEndNode())) {
 				eligibleNeighbours.add(edge.getEndNode());
 			}
 		}
@@ -119,6 +130,9 @@ public class ForestFireModelComputation {
 		newNode.setProperty(Neo4jConfiguration.ID_PROPERTY, newVertexId);
 		newNode.setProperty(INITIAL_VERTEX, ambassador.getProperty(Neo4jConfiguration.ID_PROPERTY));
 		newNode.createRelationshipTo(ambassador, Neo4jConfiguration.EDGE);
+		if (!directedGraph) {
+			ambassador.createRelationshipTo(newNode, Neo4jConfiguration.EDGE);
+		}
 
 		return newNode;
 	}
