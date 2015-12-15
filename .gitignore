@@ -1,4 +1,5 @@
 /target
+/*.tar.gz
 
 # Intellij
 *.iml

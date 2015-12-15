@@ -19,10 +19,7 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import nl.tudelft.graphalytics.Platform;
 import nl.tudelft.graphalytics.PlatformExecutionException;
-import nl.tudelft.graphalytics.domain.Algorithm;
-import nl.tudelft.graphalytics.domain.Graph;
-import nl.tudelft.graphalytics.domain.NestedConfiguration;
-import nl.tudelft.graphalytics.domain.PlatformBenchmarkResult;
+import nl.tudelft.graphalytics.domain.*;
 import nl.tudelft.graphalytics.neo4j.bfs.BreadthFirstSearchJob;
 import nl.tudelft.graphalytics.neo4j.cd.CommunityDetectionJob;
 import nl.tudelft.graphalytics.neo4j.conn.ConnectedComponentsJob;
@@ -150,8 +147,11 @@ public class Neo4jPlatform implements Platform {
 	}
 
 	@Override
-	public PlatformBenchmarkResult executeAlgorithmOnGraph(Algorithm algorithm, Graph graph, Object parameters)
-			throws PlatformExecutionException {
+	public PlatformBenchmarkResult executeAlgorithmOnGraph(Benchmark benchmark) throws PlatformExecutionException {
+		Algorithm algorithm = benchmark.getAlgorithm();
+		Graph graph = benchmark.getGraph();
+		Object parameters = benchmark.getAlgorithmParameters();
+
 		LOG.info("Executing algorithm \"{}\" on graph \"{}\"", algorithm.getName(), graph.getName());
 
 		// Create a copy of the database that is used to store the algorithm results
