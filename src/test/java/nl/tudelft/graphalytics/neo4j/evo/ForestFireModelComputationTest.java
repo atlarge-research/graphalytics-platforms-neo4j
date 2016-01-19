@@ -18,7 +18,7 @@ package nl.tudelft.graphalytics.neo4j.evo;
 import nl.tudelft.graphalytics.domain.algorithms.ForestFireModelParameters;
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
 import nl.tudelft.graphalytics.validation.GraphStructure;
-import nl.tudelft.graphalytics.validation.evo.ForestFireModelValidationTest;
+import nl.tudelft.graphalytics.validation.algorithms.evo.ForestFireModelValidationTest;
 import org.neo4j.graphdb.*;
 import org.neo4j.tooling.GlobalGraphOperations;
 

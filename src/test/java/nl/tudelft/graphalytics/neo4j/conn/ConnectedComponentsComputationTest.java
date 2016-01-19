@@ -17,8 +17,8 @@ package nl.tudelft.graphalytics.neo4j.conn;
 
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
 import nl.tudelft.graphalytics.validation.GraphStructure;
-import nl.tudelft.graphalytics.validation.conn.ConnectedComponentsOutput;
-import nl.tudelft.graphalytics.validation.conn.ConnectedComponentsValidationTest;
+import nl.tudelft.graphalytics.validation.algorithms.conn.ConnectedComponentsOutput;
+import nl.tudelft.graphalytics.validation.algorithms.conn.ConnectedComponentsValidationTest;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
