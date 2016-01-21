@@ -16,6 +16,7 @@
 package nl.tudelft.graphalytics.neo4j.bfs;
 
 import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
+import nl.tudelft.graphalytics.neo4j.Neo4jTransactionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
@@ -38,13 +39,9 @@ public class BreadthFirstSearchComputation {
 
 	public static final String DISTANCE = "DISTANCE";
 
-	private static final int MAX_TRANSACTION_SIZE = 4095;
-
 	private final GraphDatabaseService graphDatabase;
 	private final long startVertexId;
 	private final boolean directedGraph;
-	private int operationsInTransaction;
-	private Transaction transaction;
 	private Set<Node> currentFrontier;
 	private Set<Node> nextFrontier;
 
@@ -64,12 +61,10 @@ public class BreadthFirstSearchComputation {
 	 */
 	public void run() {
 		long distance = 0;
-		operationsInTransaction = 0;
 		nextFrontier = new HashSet<>();
 
 		LOG.debug("- Starting BFS algorithm");
-		transaction = graphDatabase.beginTx();
-		try {
+		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
 			Node startNode = graphDatabase.findNode(Vertex, ID_PROPERTY, startVertexId);
 			startNode.setProperty(DISTANCE, distance);
 			nextFrontier.add(startNode);
@@ -87,28 +82,15 @@ public class BreadthFirstSearchComputation {
 						if (!currentFrontier.contains(nextFrontierNode) && !nextFrontierNode.hasProperty(DISTANCE)) {
 							nextFrontierNode.setProperty(DISTANCE, distance);
 							nextFrontier.add(nextFrontierNode);
-							commitTransactionIfNecessary();
+							transactionManager.incrementOperations();
 						}
 					}
 				}
 
 				LOG.debug("- Finished iteration {} of BFS", distance);
 			}
-		} finally {
-			transaction.success();
-			transaction.close();
 		}
 		LOG.debug("- Completed BFS algorithm");
-	}
-
-	private void commitTransactionIfNecessary() {
-		operationsInTransaction++;
-		if (MAX_TRANSACTION_SIZE == operationsInTransaction) {
-			transaction.success();
-			transaction.close();
-			transaction = graphDatabase.beginTx();
-			operationsInTransaction = 0;
-		}
 	}
 
 	private void switchFrontiers() {
