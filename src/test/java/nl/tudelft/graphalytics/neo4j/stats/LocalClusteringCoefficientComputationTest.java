@@ -52,7 +52,7 @@ public class LocalClusteringCoefficientComputationTest extends LocalClusteringCo
 
 	private LocalClusteringCoefficientOutput executeLocalClusteringCoefficient(GraphStructure graph) {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		LocalClusteringCoefficientResult result = new LocalClusteringCoefficientComputation(database).run();
+		new LocalClusteringCoefficientComputation(database).run();
 
 		Map<Long, Double> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
@@ -61,7 +61,7 @@ public class LocalClusteringCoefficientComputationTest extends LocalClusteringCo
 			}
 		}
 		database.shutdown();
-		return new LocalClusteringCoefficientOutput(output, result.getMeanLcc());
+		return new LocalClusteringCoefficientOutput(output);
 	}
 
 }
