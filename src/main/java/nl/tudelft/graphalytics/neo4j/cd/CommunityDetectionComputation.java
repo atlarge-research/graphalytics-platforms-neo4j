@@ -15,12 +15,19 @@
  */
 package nl.tudelft.graphalytics.neo4j.cd;
 
-import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
-import org.neo4j.graphdb.*;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import nl.tudelft.graphalytics.neo4j.Neo4jTransactionManager;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.util.HashMap;
-import java.util.Map;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.EDGE;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
 
 /**
  * Implementation of the community detection algorithm in Neo4j. This class is responsible for the computation,
@@ -31,26 +38,19 @@ import java.util.Map;
 public class CommunityDetectionComputation {
 
 	public static final String LABEL = "LABEL";
-	public static final String LABEL_SCORE = "LABEL_SCORE";
-	public static final String NEW_LABEL = "NEW_LABEL";
-	public static final String NEW_LABEL_SCORE = "NEW_LABEL_SCORE";
 
 	private final GraphDatabaseService graphDatabase;
-	private final float nodePreference;
-	private final float hopAttenuation;
 	private final int maxIterations;
+	private Object2LongMap<Node> labels;
+	private Object2LongMap<Node> newLabels;
+	private Long2LongMap labelCounts = new Long2LongOpenHashMap();
 
 	/**
-	 * @param graphDatabase  graph database representing the input graph
-	 * @param nodePreference node preference parameter to the label propagation algorithm
-	 * @param hopAttenuation hop attenuation parameter to the label propagation algorithm
-	 * @param maxIterations  maximum number of iterations of the label propagation to run
+	 * @param graphDatabase graph database representing the input graph
+	 * @param maxIterations maximum number of iterations of the label propagation to run
 	 */
-	public CommunityDetectionComputation(GraphDatabaseService graphDatabase, float nodePreference,
-	                                     float hopAttenuation, int maxIterations) {
+	public CommunityDetectionComputation(GraphDatabaseService graphDatabase, int maxIterations) {
 		this.graphDatabase = graphDatabase;
-		this.nodePreference = nodePreference;
-		this.hopAttenuation = hopAttenuation;
 		this.maxIterations = maxIterations;
 	}
 
@@ -59,87 +59,76 @@ public class CommunityDetectionComputation {
 	 * community to which the node belongs.
 	 */
 	public void run() {
-		// Initialize the label of each node to its own ID
-		initializeLabels();
+		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
+			// Initialize the label of each node to its own ID
+			labels = initializeLabels();
+			newLabels = new Object2LongOpenHashMap<>(labels.size());
 
-		int iteration = 0;
-		boolean converged = false;
-		while (!converged && iteration < maxIterations) {
-			converged = true;
-			try (Transaction transaction = graphDatabase.beginTx()) {
-				for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
-					computeNewLabel(node);
+			int iteration = 0;
+			boolean converged = false;
+			while (!converged && iteration < maxIterations) {
+				converged = true;
+				for (Node node : labels.keySet()) {
+					long newLabel = computeNewLabel(node);
+					newLabels.put(node, newLabel);
+
+					if (labels.get(node) != newLabel) {
+						converged = false;
+					}
 				}
-				for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
-					converged = converged & updateLabel(node);
-				}
-				transaction.success();
+
+				swapLabelMaps();
+
+				iteration++;
 			}
-			iteration++;
+
+			writeLabels(transactionManager);
 		}
 	}
 
-	private void initializeLabels() {
-		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
-				node.setProperty(LABEL, node.getProperty(Neo4jConfiguration.ID_PROPERTY));
-				node.setProperty(LABEL_SCORE, 1.0);
-			}
-			transaction.success();
+	private Object2LongMap<Node> initializeLabels() {
+		Object2LongMap<Node> labels = new Object2LongOpenHashMap<>();
+		for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+			labels.put(node, (long)node.getProperty(ID_PROPERTY));
 		}
+		return labels;
 	}
 
-	private void computeNewLabel(Node node) {
-		Map<Long, Double> labelScores = new HashMap<>();
-		Map<Long, Double> maxLabelScores = new HashMap<>();
-		for (Relationship edge : node.getRelationships(Neo4jConfiguration.EDGE, Direction.BOTH)) {
-			Node other = edge.getOtherNode(node);
-			long label = (long) other.getProperty(LABEL);
-			int degree = other.getDegree(Neo4jConfiguration.EDGE, Direction.BOTH);
-			double score = (double) other.getProperty(LABEL_SCORE);
-			double weighedScore = score * Math.pow(degree, nodePreference);
+	private long computeNewLabel(Node node) {
+		// Count the frequency of labels at neighbours of the current node
+		labelCounts.clear();
+		labelCounts.defaultReturnValue(0L);
+		for (Relationship relationship : node.getRelationships(EDGE, Direction.BOTH)) {
+			long otherLabel = labels.get(relationship.getOtherNode(node));
+			labelCounts.put(otherLabel, labelCounts.get(otherLabel) + 1);
+		}
 
-			if (!labelScores.containsKey(label)) {
-				labelScores.put(label, weighedScore);
-				maxLabelScores.put(label, score);
-			} else {
-				labelScores.put(label, weighedScore + labelScores.get(label));
-				if (score > maxLabelScores.get(label))
-					maxLabelScores.put(label, score);
+		// Find the most frequent label with the lowest id
+		long bestLabel = labels.get(node);
+		long bestFrequency = 0;
+		for (Long2LongMap.Entry labelFrequencyPair : labelCounts.long2LongEntrySet()) {
+			long nextLabel = labelFrequencyPair.getLongKey();
+			long nextFrequency = labelFrequencyPair.getLongValue();
+			if (nextFrequency > bestFrequency) {
+				bestLabel = nextLabel;
+				bestFrequency = nextFrequency;
+			} else if (nextFrequency == bestFrequency && nextLabel < bestLabel) {
+				bestLabel = nextLabel;
 			}
 		}
-
-		long maxLabel = 0;
-		double maxLabelScore = Double.NEGATIVE_INFINITY;
-		for (long label : labelScores.keySet()) {
-			if (labelScores.get(label) > maxLabelScore) {
-				maxLabel = label;
-				maxLabelScore = labelScores.get(label);
-			} else if (labelScores.get(label) == maxLabelScore && label < maxLabel) {
-				maxLabel = label;
-			}
-		}
-
-		maxLabelScore = maxLabelScores.get(maxLabel);
-		if (maxLabel != (long) node.getProperty(LABEL)) {
-			maxLabelScore -= hopAttenuation;
-		}
-
-		node.setProperty(NEW_LABEL, maxLabel);
-		node.setProperty(NEW_LABEL_SCORE, maxLabelScore);
+		return bestLabel;
 	}
 
-	private boolean updateLabel(Node node) {
-		if ((long) node.getProperty(LABEL) == (long) node.getProperty(NEW_LABEL)) {
-			node.removeProperty(NEW_LABEL);
-			node.removeProperty(NEW_LABEL_SCORE);
-			return true;
-		} else {
-			node.setProperty(LABEL, node.getProperty(NEW_LABEL));
-			node.setProperty(LABEL_SCORE, node.getProperty(NEW_LABEL_SCORE));
-			node.removeProperty(NEW_LABEL);
-			node.removeProperty(NEW_LABEL_SCORE);
-			return false;
+	private void swapLabelMaps() {
+		Object2LongMap<Node> temp = labels;
+		labels = newLabels;
+		newLabels = temp;
+	}
+
+	private void writeLabels(Neo4jTransactionManager transactionManager) {
+		for (Node node : labels.keySet()) {
+			node.setProperty(LABEL, labels.get(node));
+			transactionManager.incrementOperations();
 		}
 	}
 

@@ -38,17 +38,12 @@ public class CommunityDetectionJob extends Neo4jJob {
 	 */
 	public CommunityDetectionJob(String databasePath, URL propertiesFile, Object parameters) {
 		super(databasePath, propertiesFile);
-		this.parameters = (CommunityDetectionParameters) parameters;
+		this.parameters = (CommunityDetectionParameters)parameters;
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new CommunityDetectionComputation(
-				graphDatabase,
-				parameters.getNodePreference(),
-				parameters.getHopAttenuation(),
-				parameters.getMaxIterations()
-		).run();
+		new CommunityDetectionComputation(graphDatabase, parameters.getMaxIterations()).run();
 	}
 
 }
