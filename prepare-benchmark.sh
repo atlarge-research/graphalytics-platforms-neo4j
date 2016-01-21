@@ -30,7 +30,7 @@ if [ "h$heapsize" = "h" ]; then
 fi
 echo "Using heap size: $heapsize"
 
-export java_opts="-Xmx${heapsize}m -Xms${heapsize}m -XX:+UseConcMarkSweepGC"
+export java_opts="-Xmx${heapsize}m -Xms${heapsize}m -XX:+UseG1GC"
 
 export platform="neo4j"
 export platform_classpath=

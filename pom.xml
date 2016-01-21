@@ -13,7 +13,7 @@
 		<hamcrest.version>1.3</hamcrest.version>
 		<junit.version>4.11</junit.version>
 		<log4j2.version>2.5</log4j2.version>
-		<neo4j.version>2.2.1</neo4j.version>
+		<neo4j.version>2.3.2</neo4j.version>
 	</properties>
 
 	<scm>
@@ -173,6 +173,7 @@
 						<exclude>pom.xml</exclude>
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/resources/**</exclude>
+						<exclude>src/main/assembly/**</exclude>
 						<exclude>config-template/**</exclude>
 					</excludes>
 					<mapping>
