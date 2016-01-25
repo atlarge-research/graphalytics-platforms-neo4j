@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.conn;
+package nl.tudelft.graphalytics.neo4j.algorithms.wcc;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
-import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
 import nl.tudelft.graphalytics.neo4j.Neo4jTransactionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +32,7 @@ import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.V
  *
  * @author Tim Hegeman
  */
-public class ConnectedComponentsComputation {
+public class WeaklyConnectedComponentsComputation {
 
 	private static final Logger LOG = LogManager.getLogger();
 
@@ -43,7 +42,7 @@ public class ConnectedComponentsComputation {
 	/**
 	 * @param graphDatabase graph database representing the input graph
 	 */
-	public ConnectedComponentsComputation(GraphDatabaseService graphDatabase) {
+	public WeaklyConnectedComponentsComputation(GraphDatabaseService graphDatabase) {
 		this.graphDatabase = graphDatabase;
 	}
 

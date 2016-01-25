@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.stats;
+package nl.tudelft.graphalytics.neo4j.algorithms.lcc;
 
 import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
 import org.neo4j.graphdb.*;

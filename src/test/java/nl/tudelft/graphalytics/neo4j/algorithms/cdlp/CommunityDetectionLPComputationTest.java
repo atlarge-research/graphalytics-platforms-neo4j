@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.cd;
+package nl.tudelft.graphalytics.neo4j.algorithms.cdlp;
 
-import nl.tudelft.graphalytics.domain.algorithms.CommunityDetectionParameters;
+import nl.tudelft.graphalytics.domain.algorithms.CommunityDetectionLPParameters;
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
 import nl.tudelft.graphalytics.validation.GraphStructure;
-import nl.tudelft.graphalytics.validation.algorithms.cd.CommunityDetectionOutput;
-import nl.tudelft.graphalytics.validation.algorithms.cd.CommunityDetectionValidationTest;
+import nl.tudelft.graphalytics.validation.algorithms.cdlp.CommunityDetectionLPOutput;
+import nl.tudelft.graphalytics.validation.algorithms.cdlp.CommunityDetectionLPValidationTest;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -28,31 +28,31 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import java.util.*;
 
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
-import static nl.tudelft.graphalytics.neo4j.cd.CommunityDetectionComputation.LABEL;
+import static nl.tudelft.graphalytics.neo4j.algorithms.cdlp.CommunityDetectionLPComputation.LABEL;
 
 /**
  * Test case for the community detection implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
-public class CommunityDetectionComputationTest extends CommunityDetectionValidationTest {
+public class CommunityDetectionLPComputationTest extends CommunityDetectionLPValidationTest {
 
 	@Override
-	public CommunityDetectionOutput executeDirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionParameters parameters) throws Exception {
+	public CommunityDetectionLPOutput executeDirectedCommunityDetection(GraphStructure graph,
+			CommunityDetectionLPParameters parameters) throws Exception {
 		return executeCommunityDetection(graph, parameters);
 	}
 
 	@Override
-	public CommunityDetectionOutput executeUndirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionParameters parameters) throws Exception {
+	public CommunityDetectionLPOutput executeUndirectedCommunityDetection(GraphStructure graph,
+			CommunityDetectionLPParameters parameters) throws Exception {
 		return executeCommunityDetection(graph, parameters);
 	}
 
-	private CommunityDetectionOutput executeCommunityDetection(GraphStructure graph,
-			CommunityDetectionParameters parameters) {
+	private CommunityDetectionLPOutput executeCommunityDetection(GraphStructure graph,
+			CommunityDetectionLPParameters parameters) {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		new CommunityDetectionComputation(database, parameters.getMaxIterations()).run();
+		new CommunityDetectionLPComputation(database, parameters.getMaxIterations()).run();
 
 		Map<Long, Long> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
@@ -61,7 +61,7 @@ public class CommunityDetectionComputationTest extends CommunityDetectionValidat
 			}
 		}
 		database.shutdown();
-		return new CommunityDetectionOutput(output);
+		return new CommunityDetectionLPOutput(output);
 	}
 
 }

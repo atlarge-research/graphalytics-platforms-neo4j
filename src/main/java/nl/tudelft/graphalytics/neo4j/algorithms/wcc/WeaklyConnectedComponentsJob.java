@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.evo;
+package nl.tudelft.graphalytics.neo4j.algorithms.wcc;
 
 import nl.tudelft.graphalytics.domain.Graph;
-import nl.tudelft.graphalytics.domain.algorithms.ForestFireModelParameters;
 import nl.tudelft.graphalytics.neo4j.Neo4jJob;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.net.URL;
 
 /**
- * Neo4j job configuration for executing the forest fire model for graph evolution.
+ * Neo4j job configuration for executing the connected components algorithm.
  *
  * @author Tim Hegeman
  */
-public class ForestFireModelJob extends Neo4jJob {
-
-	private final ForestFireModelParameters parameters;
+public class WeaklyConnectedComponentsJob extends Neo4jJob {
 
 	/**
 	 * @param databasePath   the path of the pre-loaded graph database
 	 * @param propertiesFile a Neo4j properties file
-	 * @param parameters     a ForestFireModelParameters object specifying the model-specific parameters
 	 */
-	public ForestFireModelJob(String databasePath, URL propertiesFile, Object parameters) {
+	public WeaklyConnectedComponentsJob(String databasePath, URL propertiesFile) {
 		super(databasePath, propertiesFile);
-		this.parameters = (ForestFireModelParameters) parameters;
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new ForestFireModelComputation(graphDatabase, parameters, graph.getGraphFormat().isDirected());
+		new WeaklyConnectedComponentsComputation(graphDatabase).run();
 	}
 
 }

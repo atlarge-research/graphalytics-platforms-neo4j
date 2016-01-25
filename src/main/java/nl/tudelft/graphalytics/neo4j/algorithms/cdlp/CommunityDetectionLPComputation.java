@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.cd;
+package nl.tudelft.graphalytics.neo4j.algorithms.cdlp;
 
 import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
@@ -35,7 +35,7 @@ import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
  *
  * @author Tim Hegeman
  */
-public class CommunityDetectionComputation {
+public class CommunityDetectionLPComputation {
 
 	public static final String LABEL = "LABEL";
 
@@ -49,7 +49,7 @@ public class CommunityDetectionComputation {
 	 * @param graphDatabase graph database representing the input graph
 	 * @param maxIterations maximum number of iterations of the label propagation to run
 	 */
-	public CommunityDetectionComputation(GraphDatabaseService graphDatabase, int maxIterations) {
+	public CommunityDetectionLPComputation(GraphDatabaseService graphDatabase, int maxIterations) {
 		this.graphDatabase = graphDatabase;
 		this.maxIterations = maxIterations;
 	}

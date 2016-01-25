@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.stats;
+package nl.tudelft.graphalytics.neo4j.algorithms.lcc;
 
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
-import nl.tudelft.graphalytics.neo4j.stats.LocalClusteringCoefficientComputation.LocalClusteringCoefficientResult;
 import nl.tudelft.graphalytics.validation.GraphStructure;
-import nl.tudelft.graphalytics.validation.algorithms.stats.LocalClusteringCoefficientOutput;
-import nl.tudelft.graphalytics.validation.algorithms.stats.LocalClusteringCoefficientValidationTest;
+import nl.tudelft.graphalytics.validation.algorithms.lcc.LocalClusteringCoefficientOutput;
+import nl.tudelft.graphalytics.validation.algorithms.lcc.LocalClusteringCoefficientValidationTest;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
-import static nl.tudelft.graphalytics.neo4j.stats.LocalClusteringCoefficientComputation.LCC;
+import static nl.tudelft.graphalytics.neo4j.algorithms.lcc.LocalClusteringCoefficientComputation.LCC;
 
 /**
  * Test case for the connected components implementation on Neo4j.

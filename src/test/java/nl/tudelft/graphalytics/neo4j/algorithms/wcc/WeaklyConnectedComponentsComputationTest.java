@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.conn;
+package nl.tudelft.graphalytics.neo4j.algorithms.wcc;
 
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
 import nl.tudelft.graphalytics.validation.GraphStructure;
-import nl.tudelft.graphalytics.validation.algorithms.conn.ConnectedComponentsOutput;
-import nl.tudelft.graphalytics.validation.algorithms.conn.ConnectedComponentsValidationTest;
+import nl.tudelft.graphalytics.validation.algorithms.wcc.WeaklyConnectedComponentsOutput;
+import nl.tudelft.graphalytics.validation.algorithms.wcc.WeaklyConnectedComponentsValidationTest;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -28,28 +28,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
-import static nl.tudelft.graphalytics.neo4j.conn.ConnectedComponentsComputation.COMPONENT;
+import static nl.tudelft.graphalytics.neo4j.algorithms.wcc.WeaklyConnectedComponentsComputation.COMPONENT;
 
 /**
  * Test case for the connected components implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
-public class ConnectedComponentsComputationTest extends ConnectedComponentsValidationTest {
+public class WeaklyConnectedComponentsComputationTest extends WeaklyConnectedComponentsValidationTest {
 
 	@Override
-	public ConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws Exception {
 		return executeConnectedComponents(graph);
 	}
 
 	@Override
-	public ConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws Exception {
 		return executeConnectedComponents(graph);
 	}
 
-	private ConnectedComponentsOutput executeConnectedComponents(GraphStructure graph) {
+	private WeaklyConnectedComponentsOutput executeConnectedComponents(GraphStructure graph) {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		new ConnectedComponentsComputation(database).run();
+		new WeaklyConnectedComponentsComputation(database).run();
 
 		Map<Long, Long> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
@@ -58,7 +58,7 @@ public class ConnectedComponentsComputationTest extends ConnectedComponentsValid
 			}
 		}
 		database.shutdown();
-		return new ConnectedComponentsOutput(output);
+		return new WeaklyConnectedComponentsOutput(output);
 	}
 
 }

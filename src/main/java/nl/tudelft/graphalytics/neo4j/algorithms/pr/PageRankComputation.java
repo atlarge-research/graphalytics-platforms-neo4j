@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.pr;
+package nl.tudelft.graphalytics.neo4j.algorithms.pr;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
 import nl.tudelft.graphalytics.neo4j.Neo4jTransactionManager;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;

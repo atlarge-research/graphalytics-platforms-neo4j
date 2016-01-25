@@ -13,37 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.cd;
+package nl.tudelft.graphalytics.neo4j.algorithms.bfs;
 
 import nl.tudelft.graphalytics.domain.Graph;
-import nl.tudelft.graphalytics.domain.algorithms.CommunityDetectionParameters;
+import nl.tudelft.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
 import nl.tudelft.graphalytics.neo4j.Neo4jJob;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.net.URL;
 
 /**
- * Neo4j job configuration for executing the community detection algorithm.
+ * Neo4j job configuration for executing the breadth-first search algorithm.
  *
  * @author Tim Hegeman
  */
-public class CommunityDetectionJob extends Neo4jJob {
+public class BreadthFirstSearchJob extends Neo4jJob {
 
-	private final CommunityDetectionParameters parameters;
+	private final BreadthFirstSearchParameters parameters;
 
 	/**
 	 * @param databasePath   path to the Neo4j database representing the graph
 	 * @param propertiesFile URL of a neo4j.properties file to load from
 	 * @param parameters     algorithm-specific parameters, must be of type BreadthFirstSearchParameters
 	 */
-	public CommunityDetectionJob(String databasePath, URL propertiesFile, Object parameters) {
+	public BreadthFirstSearchJob(String databasePath, URL propertiesFile, Object parameters) {
 		super(databasePath, propertiesFile);
-		this.parameters = (CommunityDetectionParameters)parameters;
+		this.parameters = (BreadthFirstSearchParameters) parameters;
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new CommunityDetectionComputation(graphDatabase, parameters.getMaxIterations()).run();
+		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph.getGraphFormat().isDirected()).run();
 	}
 
 }

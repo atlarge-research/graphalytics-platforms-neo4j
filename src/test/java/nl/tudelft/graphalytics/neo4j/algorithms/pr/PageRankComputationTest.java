@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.pr;
+package nl.tudelft.graphalytics.neo4j.algorithms.pr;
 
 import nl.tudelft.graphalytics.domain.algorithms.PageRankParameters;
 import nl.tudelft.graphalytics.neo4j.ValidationGraphLoader;
@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
-import static nl.tudelft.graphalytics.neo4j.pr.PageRankComputation.PAGERANK;
+import static nl.tudelft.graphalytics.neo4j.algorithms.pr.PageRankComputation.PAGERANK;
 
 /**
  * Test case for the PageRank implementation on Neo4j.

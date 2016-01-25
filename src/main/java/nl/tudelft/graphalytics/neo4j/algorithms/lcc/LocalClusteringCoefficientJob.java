@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.conn;
+package nl.tudelft.graphalytics.neo4j.algorithms.lcc;
 
 import nl.tudelft.graphalytics.domain.Graph;
 import nl.tudelft.graphalytics.neo4j.Neo4jJob;
@@ -22,23 +22,23 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import java.net.URL;
 
 /**
- * Neo4j job configuration for executing the connected components algorithm.
+ * Neo4j job configuration for calculating the (mean) local clustering coefficient.
  *
  * @author Tim Hegeman
  */
-public class ConnectedComponentsJob extends Neo4jJob {
+public class LocalClusteringCoefficientJob extends Neo4jJob {
 
 	/**
 	 * @param databasePath   the path of the pre-loaded graph database
 	 * @param propertiesFile a Neo4j properties file
 	 */
-	public ConnectedComponentsJob(String databasePath, URL propertiesFile) {
+	public LocalClusteringCoefficientJob(String databasePath, URL propertiesFile) {
 		super(databasePath, propertiesFile);
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new ConnectedComponentsComputation(graphDatabase).run();
+		new LocalClusteringCoefficientComputation(graphDatabase).run();
 	}
 
 }

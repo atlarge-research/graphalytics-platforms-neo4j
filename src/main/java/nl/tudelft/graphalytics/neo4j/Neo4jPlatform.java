@@ -20,11 +20,11 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import nl.tudelft.graphalytics.Platform;
 import nl.tudelft.graphalytics.PlatformExecutionException;
 import nl.tudelft.graphalytics.domain.*;
-import nl.tudelft.graphalytics.neo4j.bfs.BreadthFirstSearchJob;
-import nl.tudelft.graphalytics.neo4j.cd.CommunityDetectionJob;
-import nl.tudelft.graphalytics.neo4j.conn.ConnectedComponentsJob;
-import nl.tudelft.graphalytics.neo4j.evo.ForestFireModelJob;
-import nl.tudelft.graphalytics.neo4j.stats.LocalClusteringCoefficientJob;
+import nl.tudelft.graphalytics.neo4j.algorithms.bfs.BreadthFirstSearchJob;
+import nl.tudelft.graphalytics.neo4j.algorithms.cdlp.CommunityDetectionLPJob;
+import nl.tudelft.graphalytics.neo4j.algorithms.wcc.WeaklyConnectedComponentsJob;
+import nl.tudelft.graphalytics.neo4j.algorithms.ffm.ForestFireModelJob;
+import nl.tudelft.graphalytics.neo4j.algorithms.lcc.LocalClusteringCoefficientJob;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -181,13 +181,13 @@ public class Neo4jPlatform implements Platform {
 		switch (algorithm) {
 			case BFS:
 				return new BreadthFirstSearchJob(databasePath, properties, parameters);
-			case CD:
-				return new CommunityDetectionJob(databasePath, properties, parameters);
-			case CONN:
-				return new ConnectedComponentsJob(databasePath, properties);
-			case EVO:
+			case CDLP:
+				return new CommunityDetectionLPJob(databasePath, properties, parameters);
+			case WCC:
+				return new WeaklyConnectedComponentsJob(databasePath, properties);
+			case FFM:
 				return new ForestFireModelJob(databasePath, properties, parameters);
-			case STATS:
+			case LCC:
 				return new LocalClusteringCoefficientJob(databasePath, properties);
 			default:
 				throw new PlatformExecutionException("Algorithm \"" + algorithm + "\" not supported");

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.tudelft.graphalytics.neo4j.evo;
+package nl.tudelft.graphalytics.neo4j.algorithms.ffm;
 
 import nl.tudelft.graphalytics.domain.algorithms.ForestFireModelParameters;
 import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
