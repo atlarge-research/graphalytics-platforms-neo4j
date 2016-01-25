@@ -15,9 +15,17 @@
  */
 package nl.tudelft.graphalytics.neo4j.conn;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import nl.tudelft.graphalytics.neo4j.Neo4jConfiguration;
+import nl.tudelft.graphalytics.neo4j.Neo4jTransactionManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.tooling.GlobalGraphOperations;
+
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.EDGE;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
+import static nl.tudelft.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
 
 /**
  * Implementation of the connected components algorithm in Neo4j. This class is responsible for the computation,
@@ -26,6 +34,8 @@ import org.neo4j.tooling.GlobalGraphOperations;
  * @author Tim Hegeman
  */
 public class ConnectedComponentsComputation {
+
+	private static final Logger LOG = LogManager.getLogger();
 
 	public static final String COMPONENT = "COMPONENT";
 	private final GraphDatabaseService graphDatabase;
@@ -42,43 +52,46 @@ public class ConnectedComponentsComputation {
 	 * ID in each component.
 	 */
 	public void run() {
-		// Initialize the component property of all nodes to their own ID
-		initializeComponents();
+		LOG.debug("- Starting Weakly Connected Components algorithm");
+		ObjectArrayFIFOQueue<Node> nodesToVisit = new ObjectArrayFIFOQueue<>();
+		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
+			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+				if (!node.hasProperty(COMPONENT)) {
+					Object nodeId = node.getProperty(ID_PROPERTY);
+					nodesToVisit.clear();
+					nodesToVisit.enqueue(node);
+					node.setProperty(COMPONENT, nodeId);
 
-		// Repeatedly assign to each node the minimum component IDs of their neighbours, until convergence
-		boolean finished = false;
-		while (!finished) {
-			finished = true;
-			try (Transaction transaction = graphDatabase.beginTx()) {
-				for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
-					long componentId = getComponentId(node);
-					if (componentId != (long) node.getProperty(COMPONENT)) {
-						node.setProperty(COMPONENT, componentId);
-						finished = false;
+					LOG.trace("  - Exploring new component from vertex {}", nodeId);
+					exploreComponent(nodeId, nodesToVisit, transactionManager);
+					if (LOG.isTraceEnabled()) {
+						ResourceIterator<Node> componentNodes = graphDatabase.findNodes(Vertex, COMPONENT, nodeId);
+						long componentSize = 0;
+						while (componentNodes.hasNext()) {
+							componentNodes.next();
+							componentSize++;
+						}
+						LOG.trace("  - Find component of size {} containing vertex {}", componentSize, nodeId);
 					}
 				}
-				transaction.success();
 			}
 		}
+		LOG.debug("- Completed Weakly Connected Components algorithm");
 	}
 
-	private void initializeComponents() {
-		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
-				node.setProperty(COMPONENT, node.getProperty(Neo4jConfiguration.ID_PROPERTY));
+	private void exploreComponent(Object componentId, ObjectArrayFIFOQueue<Node> nodesToVisit,
+			Neo4jTransactionManager transactionManager) {
+		while (!nodesToVisit.isEmpty()) {
+			Node currentNode = nodesToVisit.dequeue();
+			for (Relationship relationship : currentNode.getRelationships(EDGE, Direction.BOTH)) {
+				Node otherNode = relationship.getOtherNode(currentNode);
+				if (!otherNode.hasProperty(COMPONENT)) {
+					otherNode.setProperty(COMPONENT, componentId);
+					nodesToVisit.enqueue(otherNode);
+					transactionManager.incrementOperations();
+				}
 			}
-			transaction.success();
 		}
-	}
-
-	private long getComponentId(Node node) {
-		long smallestComponentId = (long) node.getProperty(COMPONENT);
-		for (Relationship edge : node.getRelationships(Neo4jConfiguration.EDGE, Direction.BOTH)) {
-			long componentId = (long) edge.getOtherNode(node).getProperty(COMPONENT);
-			if (componentId < smallestComponentId)
-				smallestComponentId = componentId;
-		}
-		return smallestComponentId;
 	}
 
 }

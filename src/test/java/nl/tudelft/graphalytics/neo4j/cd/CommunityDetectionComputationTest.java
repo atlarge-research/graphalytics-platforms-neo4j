@@ -52,8 +52,7 @@ public class CommunityDetectionComputationTest extends CommunityDetectionValidat
 	private CommunityDetectionOutput executeCommunityDetection(GraphStructure graph,
 			CommunityDetectionParameters parameters) {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		new CommunityDetectionComputation(database, parameters.getNodePreference(), parameters.getHopAttenuation(),
-				parameters.getMaxIterations()).run();
+		new CommunityDetectionComputation(database, parameters.getMaxIterations()).run();
 
 		Map<Long, Long> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {

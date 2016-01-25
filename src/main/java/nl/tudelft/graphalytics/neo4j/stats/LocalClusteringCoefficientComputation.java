@@ -41,24 +41,16 @@ public class LocalClusteringCoefficientComputation {
 	}
 
 	/**
-	 * Executes the local clustering coefficient algorithm by setting the LCC property on all nodes, and returning
-	 * the mean value as a result.
+	 * Executes the local clustering coefficient algorithm by setting the LCC property on all nodes.
 	 */
-	public LocalClusteringCoefficientResult run() {
-		double sumLcc = 0.0;
-		int numNodes = 0;
-
+	public void run() {
 		try (Transaction transaction = graphDatabase.beginTx()) {
 			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
 				double lcc = computeLcc(node);
 				node.setProperty(LCC, lcc);
-				sumLcc += lcc;
-				numNodes++;
 			}
 			transaction.success();
 		}
-
-		return new LocalClusteringCoefficientResult(sumLcc / numNodes);
 	}
 
 	private double computeLcc(Node node) {
