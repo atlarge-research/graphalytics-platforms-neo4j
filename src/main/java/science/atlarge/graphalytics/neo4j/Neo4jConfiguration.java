@@ -15,7 +15,6 @@
  */
 package science.atlarge.graphalytics.neo4j;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.RelationshipType;
 
@@ -26,7 +25,7 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public final class Neo4jConfiguration {
 
-	public static final RelationshipType EDGE = DynamicRelationshipType.withName("EDGE");
+	public static final RelationshipType EDGE = RelationshipType.withName("EDGE");
 	public static final String ID_PROPERTY = "VID";
 
 	public enum VertexLabelEnum implements Label {
