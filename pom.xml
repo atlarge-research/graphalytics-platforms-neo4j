@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>nl.tudelft.graphalytics</groupId>
+	<groupId>science.atlarge.graphalytics</groupId>
 	<artifactId>graphalytics-platforms-neo4j</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -9,7 +9,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<graphalytics.version>0.3-SNAPSHOT</graphalytics.version>
+		<graphalytics.version>0.9.0</graphalytics.version>
 		<hamcrest.version>1.3</hamcrest.version>
 		<junit.version>4.11</junit.version>
 		<log4j2.version>2.5</log4j2.version>
@@ -23,12 +23,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>nl.tudelft.graphalytics</groupId>
+			<groupId>science.atlarge.graphalytics</groupId>
 			<artifactId>graphalytics-core</artifactId>
 			<version>${graphalytics.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>nl.tudelft.graphalytics</groupId>
+			<groupId>science.atlarge.graphalytics</groupId>
 			<artifactId>graphalytics-core</artifactId>
 			<version>${graphalytics.version}</version>
 			<type>tar.gz</type>
@@ -36,7 +36,7 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>nl.tudelft.graphalytics</groupId>
+			<groupId>science.atlarge.graphalytics</groupId>
 			<artifactId>graphalytics-validation</artifactId>
 			<version>${graphalytics.version}</version>
 			<scope>test</scope>
