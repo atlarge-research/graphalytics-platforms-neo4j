@@ -15,15 +15,14 @@
  */
 package science.atlarge.graphalytics.neo4j.algorithms.bfs;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import science.atlarge.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.bfs.BreadthFirstSearchOutput;
 import science.atlarge.graphalytics.validation.algorithms.bfs.BreadthFirstSearchValidationTest;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class BreadthFirstSearchComputationTest extends BreadthFirstSearchValidat
 
 		Map<Long, Long> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+			for (Node node : database.getAllNodes()) {
 				if (node.hasProperty(DISTANCE)) {
 					output.put((long)node.getProperty(ID_PROPERTY), (long)node.getProperty(DISTANCE));
 				} else {

@@ -15,15 +15,14 @@
  */
 package science.atlarge.graphalytics.neo4j.algorithms.pr;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import science.atlarge.graphalytics.domain.algorithms.PageRankParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.pr.PageRankOutput;
 import science.atlarge.graphalytics.validation.algorithms.pr.PageRankValidationTest;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class PageRankComputationTest extends PageRankValidationTest {
 
 		Map<Long, Double> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+			for (Node node : database.getAllNodes()) {
 				output.put((long)node.getProperty(ID_PROPERTY), (double)node.getProperty(PAGERANK));
 			}
 		}

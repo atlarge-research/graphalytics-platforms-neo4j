@@ -20,7 +20,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 
 import java.util.HashSet;
@@ -49,7 +48,7 @@ public class LocalClusteringCoefficientComputation {
 	 */
 	public void run() {
 		try (Transaction transaction = graphDatabase.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+			for (Node node : graphDatabase.getAllNodes()) {
 				double lcc = computeLcc(node);
 				node.setProperty(LCC, lcc);
 			}

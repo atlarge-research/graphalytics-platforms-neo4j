@@ -15,12 +15,14 @@
  */
 package science.atlarge.graphalytics.neo4j.algorithms.ffm;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import science.atlarge.graphalytics.domain.algorithms.ForestFireModelParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.ffm.ForestFireModelValidationTest;
-import org.neo4j.graphdb.*;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,10 +58,10 @@ public class ForestFireModelComputationTest extends ForestFireModelValidationTes
 
 		Map<Long, Set<Long>> edgeLists = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+			for (Node node : database.getAllNodes()) {
 				edgeLists.put((long)node.getProperty(ID_PROPERTY), new HashSet<Long>());
 			}
-			for (Relationship relationship : GlobalGraphOperations.at(database).getAllRelationships()) {
+			for (Relationship relationship : database.getAllRelationships()) {
 				if (relationship.isType(EDGE)) {
 					edgeLists.get(relationship.getStartNode().getProperty(ID_PROPERTY))
 							.add((long)relationship.getEndNode().getProperty(ID_PROPERTY));

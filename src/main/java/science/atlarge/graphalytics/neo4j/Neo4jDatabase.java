@@ -18,6 +18,7 @@ package science.atlarge.graphalytics.neo4j;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+import java.io.File;
 import java.net.URL;
 
 /**
@@ -38,7 +39,7 @@ public class Neo4jDatabase implements AutoCloseable {
 	 */
 	public Neo4jDatabase(String databasePath, URL propertiesFile) {
 		this.graphDatabase = new GraphDatabaseFactory()
-				.newEmbeddedDatabaseBuilder(databasePath)
+				.newEmbeddedDatabaseBuilder(new File(databasePath))
 				.loadPropertiesFromURL(propertiesFile)
 				.newGraphDatabase();
 	}

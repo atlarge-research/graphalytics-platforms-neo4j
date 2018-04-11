@@ -23,7 +23,6 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;
@@ -88,7 +87,7 @@ public class CommunityDetectionLPComputation {
 
 	private Object2LongMap<Node> initializeLabels() {
 		Object2LongMap<Node> labels = new Object2LongOpenHashMap<>();
-		for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+		for (Node node : graphDatabase.getAllNodes()) {
 			labels.put(node, (long)node.getProperty(ID_PROPERTY));
 		}
 		return labels;

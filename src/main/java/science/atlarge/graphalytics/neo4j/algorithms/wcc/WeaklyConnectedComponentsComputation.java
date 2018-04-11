@@ -23,7 +23,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.tooling.GlobalGraphOperations;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;
@@ -58,7 +57,7 @@ public class WeaklyConnectedComponentsComputation {
 		LOG.debug("- Starting Weakly Connected Components algorithm");
 		ObjectArrayFIFOQueue<Node> nodesToVisit = new ObjectArrayFIFOQueue<>();
 		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
-			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+			for (Node node : graphDatabase.getAllNodes()) {
 				if (!node.hasProperty(COMPONENT)) {
 					Object nodeId = node.getProperty(ID_PROPERTY);
 					nodesToVisit.clear();

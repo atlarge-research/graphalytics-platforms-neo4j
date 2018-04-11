@@ -21,12 +21,15 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
 
@@ -97,7 +100,7 @@ public abstract class AbstractComputationTest {
 	protected void updateGraph() {
 		vertexToNodeIds.clear();
 		try (Transaction ignored = graphDatabase.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+			for (Node node : graphDatabase.getAllNodes()) {
 				vertexToNodeIds.put((long)node.getProperty(Neo4jConfiguration.ID_PROPERTY), node.getId());
 			}
 		}

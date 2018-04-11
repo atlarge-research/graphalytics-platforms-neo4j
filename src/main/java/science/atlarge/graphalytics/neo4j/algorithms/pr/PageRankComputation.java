@@ -21,7 +21,6 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;
@@ -87,7 +86,7 @@ public class PageRankComputation {
 		int danglingNodeCount = 0;
 		prValues = new Object2DoubleOpenHashMap<>(numberOfVertices);
 
-		for (Node node : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+		for (Node node : graphDatabase.getAllNodes()) {
 			prValues.put(node, 1.0 / numberOfVertices);
 			if (!node.hasRelationship(EDGE, Direction.OUTGOING)) {
 				danglingNodeCount++;

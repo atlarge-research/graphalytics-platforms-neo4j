@@ -15,14 +15,13 @@
  */
 package science.atlarge.graphalytics.neo4j.algorithms.lcc;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.lcc.LocalClusteringCoefficientOutput;
 import science.atlarge.graphalytics.validation.algorithms.lcc.LocalClusteringCoefficientValidationTest;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class LocalClusteringCoefficientComputationTest extends LocalClusteringCo
 
 		Map<Long, Double> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
-			for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+			for (Node node : database.getAllNodes()) {
 				output.put((long)node.getProperty(ID_PROPERTY), (double)node.getProperty(LCC));
 			}
 		}

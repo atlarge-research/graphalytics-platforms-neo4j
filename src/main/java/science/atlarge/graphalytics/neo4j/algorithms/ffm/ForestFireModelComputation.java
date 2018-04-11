@@ -20,7 +20,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 import science.atlarge.graphalytics.domain.algorithms.ForestFireModelParameters;
 import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 
@@ -150,7 +149,7 @@ public class ForestFireModelComputation {
 		// Select a random ambassador by assigning each node a random value and picking the node with the largest value
 		Node ambassador = null;
 		float maxValue = Float.NEGATIVE_INFINITY;
-		for (Node possibleAmbassador : GlobalGraphOperations.at(graphDatabase).getAllNodes()) {
+		for (Node possibleAmbassador : graphDatabase.getAllNodes()) {
 			float randomValue = random.nextFloat();
 			if (randomValue > maxValue) {
 				ambassador = possibleAmbassador;
