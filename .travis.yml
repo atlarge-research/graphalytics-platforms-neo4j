@@ -1,0 +1,8 @@
+language: java
+install:
+  - git clone --depth 1 https://github.com/ldbc/ldbc_graphalytics
+  - cd ldbc_graphalytics
+  - mvn install -DskipTests
+  - cd ..
+script:
+  - mvn compile
