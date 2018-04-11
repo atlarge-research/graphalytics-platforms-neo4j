@@ -5,4 +5,4 @@ install:
   - mvn install -DskipTests
   - cd ..
 script:
-  - mvn compile
+  - mvn compile test
