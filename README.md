@@ -1,7 +1,6 @@
 # Graphalytics Neo4j platform extension
 
-[![Build Status](http://jenkins.tribler.org/buildStatus/icon?job=Graphalytics_Neo4j_master_tester)](http://jenkins.tribler.org/job/Graphalytics_Neo4j_master_tester/)
-
+[![Build Status](https://travis-ci.org/szarnyasg/graphalytics-platforms-neo4j.svg?branch=update-to-0.9.0)](https://travis-ci.org/szarnyasg/graphalytics-platforms-neo4j)
 
 ## Getting started
 

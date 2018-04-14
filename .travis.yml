@@ -1,8 +1,8 @@
 language: java
 install:
-  - git clone --depth 1 https://github.com/ldbc/ldbc_graphalytics
-  - cd ldbc_graphalytics
+  - git clone --depth 1 https://github.com/neo4j-contrib/neo4j-graph-algorithms
+  - cd neo4j-graph-algorithms
   - mvn install -DskipTests
   - cd ..
 script:
-  - mvn compile test
+  - mvn compile

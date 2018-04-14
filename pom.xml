@@ -13,13 +13,22 @@
 		<hamcrest.version>1.3</hamcrest.version>
 		<junit.version>4.11</junit.version>
 		<log4j2.version>2.5</log4j2.version>
-		<neo4j.version>3.3.4</neo4j.version>
+		<neo4j.version>3.2.5</neo4j.version>
+		<neo4j.graph.algorithms.version>3.2.9.0</neo4j.graph.algorithms.version>
 	</properties>
 
 	<scm>
 		<developerConnection>scm:git:ssh://git@github.com/tudelft-atlarge/graphalytics-platforms-neo4j</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+
+	<repositories>
+		<repository>
+			<id>graphalytics</id>
+			<name>Graphalytics</name>
+			<url>https://atlarge.ewi.tudelft.nl/graphalytics/mvn/</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -62,6 +71,11 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j</artifactId>
 			<version>${neo4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>graph-algorithms-algo</artifactId>
+			<version>${neo4j.graph.algorithms.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>

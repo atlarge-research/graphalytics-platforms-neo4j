@@ -16,6 +16,7 @@
 package science.atlarge.graphalytics.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.graph.Graph;
 
 import java.net.URL;
@@ -45,7 +46,7 @@ public abstract class Neo4jJob {
 	 *
 	 * @param graph the graph type to be computed
 	 */
-	public void run(Graph graph) {
+	public void run(Graph graph) throws KernelException {
 		try (Neo4jDatabase graphDatabase = new Neo4jDatabase(databasePath, propertiesFile)) {
 			runComputation(graphDatabase.get(), graph);
 		}
@@ -56,6 +57,6 @@ public abstract class Neo4jJob {
 	 *
 	 * @param graphDatabase a Neo4j graph database
 	 */
-	public abstract void runComputation(GraphDatabaseService graphDatabase, Graph graph);
+	public abstract void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException;
 
 }

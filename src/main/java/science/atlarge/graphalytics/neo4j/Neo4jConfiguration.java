@@ -27,6 +27,7 @@ public final class Neo4jConfiguration {
 
 	public static final RelationshipType EDGE = RelationshipType.withName("EDGE");
 	public static final String ID_PROPERTY = "VID";
+	public static final String WEIGHT_PROPERTY = "WEIGHT";
 
 	public enum VertexLabelEnum implements Label {
 		Vertex

@@ -13,48 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package science.atlarge.graphalytics.neo4j;
+package science.atlarge.graphalytics.neo4j.algolib.lcc;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.api.exceptions.KernelException;
+import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.neo4j.Neo4jJob;
 
-import java.io.File;
 import java.net.URL;
 
 /**
- * Wrapper class for the initialization and safe shutdown of a Neo4j database.
+ * Neo4j job configuration for calculating the (mean) local clustering coefficient.
  *
  * @author Tim Hegeman
  */
-public class Neo4jDatabase implements AutoCloseable {
-
-	private final GraphDatabaseService graphDatabase;
+public class LocalClusteringCoefficientJob extends Neo4jJob {
 
 	/**
-	 * Initializes an embedded Neo4j database using data stored in the specified path, and using configuration specified
-	 * in the provided properties file.
-	 *
 	 * @param databasePath   the path of the pre-loaded graph database
 	 * @param propertiesFile a Neo4j properties file
 	 */
-	public Neo4jDatabase(String databasePath, URL propertiesFile) throws KernelException {
-		this.graphDatabase = new GraphDatabaseFactory()
-				.newEmbeddedDatabaseBuilder(new File(databasePath))
-				.loadPropertiesFromURL(propertiesFile)
-				.newGraphDatabase();
-	}
-
-	/**
-	 * @return a handle to the Neo4j database
-	 */
-	public GraphDatabaseService get() {
-		return graphDatabase;
+	public LocalClusteringCoefficientJob(String databasePath, URL propertiesFile) {
+		super(databasePath, propertiesFile);
 	}
 
 	@Override
-	public void close() {
-		graphDatabase.shutdown();
+	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
+		new LocalClusteringCoefficientComputation(graphDatabase).run();
 	}
 
 }

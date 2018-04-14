@@ -27,6 +27,7 @@ import science.atlarge.graphalytics.domain.graph.LoadedGraph;
 import science.atlarge.graphalytics.execution.Platform;
 import science.atlarge.graphalytics.execution.PlatformExecutionException;
 import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.algolib.sssp.SingleSourceShortestPathsJob;
 import science.atlarge.graphalytics.neo4j.algorithms.bfs.BreadthFirstSearchJob;
 import science.atlarge.graphalytics.neo4j.algorithms.cdlp.CommunityDetectionLPJob;
 import science.atlarge.graphalytics.neo4j.algorithms.ffm.ForestFireModelJob;
@@ -97,6 +98,8 @@ public class Neo4jPlatform implements Platform {
 				return new ForestFireModelJob(databasePath, properties, parameters);
 			case LCC:
 				return new LocalClusteringCoefficientJob(databasePath, properties);
+			case SSSP:
+				return new SingleSourceShortestPathsJob(databasePath, properties, parameters);
 			default:
 				throw new PlatformExecutionException("Algorithm \"" + algorithm + "\" not supported");
 		}
