@@ -15,6 +15,8 @@
  */
 package science.atlarge.graphalytics.neo4j;
 
+import org.neo4j.graphdb.Relationship;
+import science.atlarge.graphalytics.util.graph.PropertyGraph;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -28,6 +30,7 @@ import java.util.Map;
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
+import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.WEIGHT_PROPERTY;
 
 /**
  * Utility class for loading a validation graph into a Neo4j in-memory database.
@@ -53,6 +56,32 @@ public final class ValidationGraphLoader {
 				Node sourceVertex = vertexToNode.get(vertexId);
 				for (long neighbourId : validationGraph.getEdgesForVertex(vertexId)) {
 					sourceVertex.createRelationshipTo(vertexToNode.get(neighbourId), EDGE);
+				}
+			}
+
+			tx.success();
+		}
+		return graphDatabase;
+	}
+
+
+	public static <V, E> GraphDatabaseService loadValidationGraphToDatabase(PropertyGraph<V, E> graph) {
+		GraphDatabaseService graphDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+		try (Transaction tx = graphDatabase.beginTx()) {
+			Map<PropertyGraph<V, E>.Vertex, Node> vertexToNode = new HashMap<>();
+			for (PropertyGraph<V, E>.Vertex vertex : graph.getVertices()) {
+				Node newVertex = graphDatabase.createNode((Label)Vertex);
+				newVertex.setProperty(ID_PROPERTY, vertex.getId());
+				vertexToNode.put(vertex, newVertex);
+			}
+
+			for (PropertyGraph<V, E>.Vertex vertex : graph.getVertices()) {
+				Node sourceVertex = vertexToNode.get(vertex);
+
+				for (PropertyGraph<V, E>.Edge edge : vertex.getOutgoingEdges()) {
+					PropertyGraph<V, E>.Vertex destinationVertex = edge.getDestinationVertex();
+					Relationship rel = sourceVertex.createRelationshipTo(vertexToNode.get(destinationVertex), EDGE);
+					rel.setProperty(WEIGHT_PROPERTY, edge.getValue());
 				}
 			}
 
