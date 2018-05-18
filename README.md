@@ -15,4 +15,4 @@ The `neo4j` benchmark is run locally on the machine on which Graphalytics is lau
 - `neo4j.db.path`: Set to an appropriate path to store Neo4j databases in.
 
 Other options in the `config/neo4j.properties` file are passed directly to Neo4j. This should be used to set e.g. buffer sizes.
-
+ 
