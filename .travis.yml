@@ -1,4 +1,4 @@
 language: java
 install: true
 script:
-  - mvn package -DskipTests
+  - mvn install -DskipTests
