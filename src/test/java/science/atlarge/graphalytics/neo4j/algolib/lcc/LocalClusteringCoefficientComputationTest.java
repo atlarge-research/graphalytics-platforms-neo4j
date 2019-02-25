@@ -15,7 +15,6 @@
  */
 package science.atlarge.graphalytics.neo4j.algolib.lcc;
 
-import org.junit.Ignore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -32,7 +31,7 @@ import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
 import static science.atlarge.graphalytics.neo4j.algorithms.lcc.LocalClusteringCoefficientComputation.LCC;
 
 /**
- * Test case for the connected components implementation on Neo4j.
+ * Test case for the clustering coefficient implementation on Neo4j.
  *
  * @author Tim Hegeman
  */
