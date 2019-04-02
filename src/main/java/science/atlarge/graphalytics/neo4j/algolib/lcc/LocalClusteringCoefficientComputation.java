@@ -35,12 +35,14 @@ public class LocalClusteringCoefficientComputation {
 
 	public static final String LCC = "LCC";
 	private final GraphDatabaseService graphDatabase;
+	private final boolean directed;
 
 	/**
 	 * @param graphDatabase graph database representing the input graph
 	 */
-	public LocalClusteringCoefficientComputation(GraphDatabaseService graphDatabase) throws KernelException {
+	public LocalClusteringCoefficientComputation(GraphDatabaseService graphDatabase, boolean directed) throws KernelException {
 		this.graphDatabase = graphDatabase;
+		this.directed = directed;
 
 		AlgoLibHelper.registerProcedure(graphDatabase, TriangleProc.class);
 	}
@@ -50,6 +52,10 @@ public class LocalClusteringCoefficientComputation {
 	 */
 	public void run() {
 		LOG.debug("- Starting Local Clustering Coefficient computation algorithm");
+
+		if (directed == true) {
+			throw new UnsupportedOperationException("Directed LCC algorithm not yet supported");
+		}
 		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
 			final String command = String.format("" +
 					"CALL algo.triangleCount(null, null, {write: true, clusteringCoefficientProperty: '%s'})\n" +

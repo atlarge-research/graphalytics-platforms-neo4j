@@ -39,7 +39,7 @@ public class LocalClusteringCoefficientJob extends Neo4jJob {
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
-		new LocalClusteringCoefficientComputation(graphDatabase).run();
+		new LocalClusteringCoefficientComputation(graphDatabase, graph.isDirected()).run();
 	}
 
 }

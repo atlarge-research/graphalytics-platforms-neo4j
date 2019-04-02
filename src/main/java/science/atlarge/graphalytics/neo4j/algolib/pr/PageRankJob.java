@@ -38,12 +38,17 @@ public class PageRankJob extends Neo4jJob {
 	 */
 	public PageRankJob(String databasePath, URL propertiesFile, Object parameters) {
 		super(databasePath, propertiesFile);
-		this.parameters = (PageRankParameters)parameters;
+		this.parameters = (PageRankParameters) parameters;
 	}
 
 	@Override
     public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
-        new PageRankComputation(graphDatabase, parameters.getNumberOfIterations(), parameters.getDampingFactor()).run();
+        new PageRankComputation(
+        		graphDatabase,
+				parameters.getNumberOfIterations(),
+				parameters.getDampingFactor(),
+				graph.isDirected()
+			).run();
     }
 
 }

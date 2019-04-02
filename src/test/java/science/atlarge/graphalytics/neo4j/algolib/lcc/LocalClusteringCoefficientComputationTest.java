@@ -40,18 +40,18 @@ public class LocalClusteringCoefficientComputationTest extends LocalClusteringCo
 	@Override
 	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph)
 			throws Exception {
-		return executeLocalClusteringCoefficient(graph);
+		return executeLocalClusteringCoefficient(graph, true);
 	}
 
 	@Override
 	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph)
 			throws Exception {
-		return executeLocalClusteringCoefficient(graph);
+		return executeLocalClusteringCoefficient(graph, false);
 	}
 
-	private LocalClusteringCoefficientOutput executeLocalClusteringCoefficient(GraphStructure graph) throws KernelException {
+	private LocalClusteringCoefficientOutput executeLocalClusteringCoefficient(GraphStructure graph, boolean directed) throws KernelException {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		new LocalClusteringCoefficientComputation(database).run();
+		new LocalClusteringCoefficientComputation(database, directed).run();
 
 		Map<Long, Double> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {

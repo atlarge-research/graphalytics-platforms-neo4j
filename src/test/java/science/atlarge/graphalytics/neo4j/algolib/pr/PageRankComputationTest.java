@@ -50,7 +50,7 @@ public class PageRankComputationTest extends PageRankValidationTest {
 
 	private PageRankOutput executePagerank(GraphStructure graph, PageRankParameters parameters, boolean directed) throws KernelException {
 		GraphDatabaseService database = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
-		new PageRankComputation(database, parameters.getNumberOfIterations(), parameters.getDampingFactor()).run();
+		new PageRankComputation(database, parameters.getNumberOfIterations(), parameters.getDampingFactor(), directed).run();
 
 		Map<Long, Double> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {

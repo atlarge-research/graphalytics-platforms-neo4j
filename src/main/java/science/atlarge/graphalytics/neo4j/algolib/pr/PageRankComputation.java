@@ -38,16 +38,18 @@ public class PageRankComputation {
     private final GraphDatabaseService graphDatabase;
     private final int maxIterations;
     private final float dampingFactor;
+    private final boolean directed;
 
     /**
      * @param graphDatabase graph database representing the input graph
      * @param maxIterations maximum number of iterations of the PageRank algorithm to run
      * @param dampingFactor the damping factor parameter for the PageRank algorithm
      */
-    public PageRankComputation(GraphDatabaseService graphDatabase, int maxIterations, float dampingFactor) throws KernelException {
+    public PageRankComputation(GraphDatabaseService graphDatabase, int maxIterations, float dampingFactor, boolean directed) throws KernelException {
         this.graphDatabase = graphDatabase;
         this.maxIterations = maxIterations;
         this.dampingFactor = dampingFactor;
+        this.directed = directed;
 
         AlgoLibHelper.registerProcedure(graphDatabase, PageRankProc.class);
     }
@@ -60,12 +62,13 @@ public class PageRankComputation {
         try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
             final String command = String.format("" +
                             "CALL algo.pageRank(null, null,\n" +
-                            "  {write: true, writeProperty: '%s', iterations: %d, dampingFactor: %f}\n" +
+                            "  {write: true, writeProperty: '%s', iterations: %d, dampingFactor: %f, direction: '%s'}\n" +
                             ")\n" +
                             "YIELD nodes, iterations, loadMillis, computeMillis, writeMillis, dampingFactor, write, writeProperty",
                     PAGERANK,
                     maxIterations,
-                    dampingFactor
+                    dampingFactor,
+                    directed ? "OUTGOING" : "BOTH"
             );
             graphDatabase.execute(command);
         }
