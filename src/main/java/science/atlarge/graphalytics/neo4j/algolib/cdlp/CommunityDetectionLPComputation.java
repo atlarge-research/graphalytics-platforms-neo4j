@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.neo4j.graphalgo.LabelPropagationProc;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 import science.atlarge.graphalytics.neo4j.algolib.AlgoLibHelper;
 
@@ -43,7 +43,11 @@ public class CommunityDetectionLPComputation {
      * @param graphDatabase graph database representing the input graph
      * @param maxIterations maximum number of iterations of the label propagation to run
      */
-    public CommunityDetectionLPComputation(GraphDatabaseService graphDatabase, int maxIterations, boolean directed) throws KernelException {
+    public CommunityDetectionLPComputation(
+            GraphDatabaseService graphDatabase,
+            int maxIterations,
+            boolean directed
+    ) throws KernelException {
         this.graphDatabase = graphDatabase;
         this.maxIterations = maxIterations;
         this.directed = directed;

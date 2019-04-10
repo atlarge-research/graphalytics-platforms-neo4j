@@ -15,20 +15,11 @@
  */
 package science.atlarge.graphalytics.neo4j.algorithms.ffm;
 
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import science.atlarge.graphalytics.domain.algorithms.ForestFireModelParameters;
 import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of the forest fire model for graph evolution using Neo4j.
@@ -49,7 +40,7 @@ public class ForestFireModelComputation {
 	 * @param directedGraph true iff the input graph is directed
 	 */
 	public ForestFireModelComputation(GraphDatabaseService graphDatabase, ForestFireModelParameters parameters,
-			boolean directedGraph) {
+                                      boolean directedGraph) {
 		this.graphDatabase = graphDatabase;
 		this.parameters = parameters;
 		this.directedGraph = directedGraph;
@@ -97,7 +88,7 @@ public class ForestFireModelComputation {
 	}
 
 	private void selectOutLinks(Node newVertex, Node burningVertex, Set<Node> burntVertices,
-			Set<Node> newBurningVertices) {
+                                Set<Node> newBurningVertices) {
 		int count = randomGeometric(parameters.getPRatio());
 		List<Node> eligibleNeighbours = new ArrayList<>();
 		for (Relationship edge : burningVertex.getRelationships(Neo4jConfiguration.EDGE, Direction.OUTGOING)) {
@@ -111,7 +102,7 @@ public class ForestFireModelComputation {
 	}
 
 	private void selectInLinks(Node newVertex, Node burningVertex, Set<Node> burntVertices,
-			Set<Node> newBurningVertices) {
+                               Set<Node> newBurningVertices) {
 		int count = randomGeometric(parameters.getRRatio());
 		List<Node> eligibleNeighbours = new ArrayList<>();
 		for (Relationship edge : burningVertex.getRelationships(Neo4jConfiguration.EDGE, Direction.INCOMING)) {

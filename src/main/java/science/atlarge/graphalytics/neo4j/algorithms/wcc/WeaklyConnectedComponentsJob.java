@@ -17,9 +17,9 @@ package science.atlarge.graphalytics.neo4j.algorithms.wcc;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for executing the connected components algorithm.
@@ -28,17 +28,16 @@ import java.net.URL;
  */
 public class WeaklyConnectedComponentsJob extends Neo4jJob {
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 */
-	public WeaklyConnectedComponentsJob(String databasePath, URL propertiesFile) {
-		super(databasePath, propertiesFile);
-	}
+	public WeaklyConnectedComponentsJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+                                        String inputPath, String outputPath) {
+        super(runSpecification, platformConfig, inputPath, outputPath);
+    }
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new WeaklyConnectedComponentsComputation(graphDatabase).run();
+		new WeaklyConnectedComponentsComputation(
+				graphDatabase
+		).run();
 	}
 
 }

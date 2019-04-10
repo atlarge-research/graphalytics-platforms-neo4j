@@ -17,15 +17,11 @@ package science.atlarge.graphalytics.neo4j.algorithms.bfs;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
@@ -38,66 +34,66 @@ import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelE
  */
 public class BreadthFirstSearchComputation {
 
-	private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger();
 
-	public static final String DISTANCE = "DISTANCE";
+    public static final String DISTANCE = "DISTANCE";
 
-	private final GraphDatabaseService graphDatabase;
-	private final long startVertexId;
-	private final boolean directedGraph;
-	private Set<Node> currentFrontier;
-	private Set<Node> nextFrontier;
+    private final GraphDatabaseService graphDatabase;
+    private final long startVertexId;
+    private final boolean directedGraph;
+    private Set<Node> currentFrontier;
+    private Set<Node> nextFrontier;
 
-	/**
-	 * @param graphDatabase graph database representing the input graph
-	 * @param startVertexId source vertex for the breadth-first search
-	 */
-	public BreadthFirstSearchComputation(GraphDatabaseService graphDatabase, long startVertexId, boolean directedGraph) {
-		this.graphDatabase = graphDatabase;
-		this.startVertexId = startVertexId;
-		this.directedGraph = directedGraph;
-	}
+    /**
+     * @param graphDatabase graph database representing the input graph
+     * @param startVertexId source vertex for the breadth-first search
+     */
+    BreadthFirstSearchComputation(GraphDatabaseService graphDatabase, long startVertexId, boolean directedGraph) {
+        this.graphDatabase = graphDatabase;
+        this.startVertexId = startVertexId;
+        this.directedGraph = directedGraph;
+    }
 
-	/**
-	 * Executes the breadth-first search algorithm by setting the DISTANCE property of all nodes reachable from the
-	 * start vertex.
-	 */
-	public void run() {
-		long distance = 0;
-		nextFrontier = new HashSet<>();
+    /**
+     * Executes the breadth-first search algorithm by setting the DISTANCE property of all nodes reachable from the
+     * start vertex.
+     */
+    public void run() {
+        long distance = 0;
+        nextFrontier = new HashSet<>();
 
-		LOG.debug("- Starting BFS algorithm");
-		try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
-			Node startNode = graphDatabase.findNode(Vertex, ID_PROPERTY, startVertexId);
-			startNode.setProperty(DISTANCE, distance);
-			nextFrontier.add(startNode);
+        LOG.debug("- Starting BFS algorithm");
+        try (Neo4jTransactionManager transactionManager = new Neo4jTransactionManager(graphDatabase)) {
+            Node startNode = graphDatabase.findNode(Vertex, ID_PROPERTY, startVertexId);
+            startNode.setProperty(DISTANCE, distance);
+            nextFrontier.add(startNode);
 
-			LOG.debug("- Starting BFS at node \"{}\"", startNode.getId());
+            LOG.debug("- Starting BFS at node \"{}\"", startNode.getId());
 
-			Direction traversalDirection = directedGraph ? Direction.OUTGOING : Direction.BOTH;
+            Direction traversalDirection = directedGraph ? Direction.OUTGOING : Direction.BOTH;
 
-			while (!nextFrontier.isEmpty()) {
-				switchFrontiers();
-				distance++;
-				for (Node currentFrontierNode : currentFrontier) {
-					for (Relationship relationship : currentFrontierNode.getRelationships(Neo4jConfiguration.EDGE, traversalDirection)) {
-						Node nextFrontierNode = relationship.getEndNode();
-						if (!currentFrontier.contains(nextFrontierNode) && !nextFrontierNode.hasProperty(DISTANCE)) {
-							nextFrontierNode.setProperty(DISTANCE, distance);
-							nextFrontier.add(nextFrontierNode);
-							transactionManager.incrementOperations();
-						}
-					}
-				}
+            while (!nextFrontier.isEmpty()) {
+                switchFrontiers();
+                distance++;
+                for (Node currentFrontierNode : currentFrontier) {
+                    for (Relationship relationship : currentFrontierNode.getRelationships(Neo4jConfiguration.EDGE, traversalDirection)) {
+                        Node nextFrontierNode = relationship.getEndNode();
+                        if (!currentFrontier.contains(nextFrontierNode) && !nextFrontierNode.hasProperty(DISTANCE)) {
+                            nextFrontierNode.setProperty(DISTANCE, distance);
+                            nextFrontier.add(nextFrontierNode);
+                            transactionManager.incrementOperations();
+                        }
+                    }
+                }
 
-				LOG.debug("- Finished iteration {} of BFS", distance);
-			}
-		}
-		LOG.debug("- Completed BFS algorithm");
-	}
+                LOG.debug("- Finished iteration {} of BFS", distance);
+            }
+        }
+        LOG.debug("- Completed BFS algorithm");
+    }
 
-	private void switchFrontiers() {
-		currentFrontier = nextFrontier;
-		nextFrontier = new HashSet<>();
-	}
+    private void switchFrontiers() {
+        currentFrontier = nextFrontier;
+        nextFrontier = new HashSet<>();
+    }
 }

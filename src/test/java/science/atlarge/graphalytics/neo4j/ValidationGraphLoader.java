@@ -15,22 +15,16 @@
  */
 package science.atlarge.graphalytics.neo4j;
 
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
+import org.neo4j.test.TestGraphDatabaseFactory;
 import science.atlarge.graphalytics.util.graph.PropertyGraph;
 import science.atlarge.graphalytics.validation.GraphStructure;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.ID_PROPERTY;
+import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.*;
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.WEIGHT_PROPERTY;
 
 /**
  * Utility class for loading a validation graph into a Neo4j in-memory database.

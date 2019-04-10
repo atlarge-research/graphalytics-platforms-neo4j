@@ -15,11 +15,10 @@
  */
 package science.atlarge.graphalytics.neo4j.algolib.cdlp;
 
-import org.junit.Ignore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.CommunityDetectionLPParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
@@ -41,13 +40,13 @@ public class CommunityDetectionLPComputationTest extends CommunityDetectionLPVal
 
 	@Override
 	public CommunityDetectionLPOutput executeDirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionLPParameters parameters) throws Exception {
+			CommunityDetectionLPParameters parameters) throws KernelException {
 		return executeCommunityDetection(graph, parameters, true);
 	}
 
 	@Override
 	public CommunityDetectionLPOutput executeUndirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionLPParameters parameters) throws Exception {
+			CommunityDetectionLPParameters parameters) throws KernelException {
 		return executeCommunityDetection(graph, parameters, false);
 	}
 
@@ -59,7 +58,7 @@ public class CommunityDetectionLPComputationTest extends CommunityDetectionLPVal
 		Map<Long, Long> output = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
 			for (Node node : database.getAllNodes()) {
-				output.put((long)node.getProperty(ID_PROPERTY), Long.valueOf((int)node.getProperty(LABEL)));
+				output.put((long)node.getProperty(ID_PROPERTY), (long)node.getProperty(LABEL));
 			}
 		}
 		database.shutdown();

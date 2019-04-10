@@ -18,7 +18,7 @@ package science.atlarge.graphalytics.neo4j.algolib.bfs;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
@@ -40,13 +40,13 @@ public class BreadthFirstSearchComputationTest extends BreadthFirstSearchValidat
 
 	@Override
 	public BreadthFirstSearchOutput executeDirectedBreadthFirstSearch(GraphStructure graph,
-			BreadthFirstSearchParameters parameters) throws Exception {
+			BreadthFirstSearchParameters parameters) throws KernelException {
 		return executeBreadthFirstSearch(graph, parameters, true);
 	}
 
 	@Override
 	public BreadthFirstSearchOutput executeUndirectedBreadthFirstSearch(GraphStructure graph,
-			BreadthFirstSearchParameters parameters) throws Exception {
+			BreadthFirstSearchParameters parameters) throws KernelException {
 		return executeBreadthFirstSearch(graph, parameters, false);
 	}
 

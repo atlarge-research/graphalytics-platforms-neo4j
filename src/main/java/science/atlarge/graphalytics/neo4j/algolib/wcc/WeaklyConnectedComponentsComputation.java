@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.neo4j.graphalgo.UnionFindProc;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 import science.atlarge.graphalytics.neo4j.algolib.AlgoLibHelper;
 

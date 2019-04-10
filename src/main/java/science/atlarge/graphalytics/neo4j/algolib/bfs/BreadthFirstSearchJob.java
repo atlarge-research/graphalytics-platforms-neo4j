@@ -16,12 +16,12 @@
 package science.atlarge.graphalytics.neo4j.algolib.bfs;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for executing the breadth-first search algorithm.
@@ -32,19 +32,21 @@ public class BreadthFirstSearchJob extends Neo4jJob {
 
 	private final BreadthFirstSearchParameters parameters;
 
-	/**
-	 * @param databasePath   path to the Neo4j database representing the graph
-	 * @param propertiesFile URL of a neo4j.properties file to load from
-	 * @param parameters     algorithm-specific parameters, must be of type BreadthFirstSearchParameters
-	 */
-	public BreadthFirstSearchJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (BreadthFirstSearchParameters) parameters;
+	public BreadthFirstSearchJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+								 String inputPath, String outputPath) {
+		super(runSpecification, platformConfig, inputPath, outputPath);
+		this.parameters = (BreadthFirstSearchParameters)runSpecification
+				.getBenchmarkRun()
+				.getAlgorithmParameters();
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
-		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph.isDirected()).run();
+		new BreadthFirstSearchComputation(
+				graphDatabase,
+				parameters.getSourceVertex(),
+				graph.isDirected()
+		).run();
 	}
 
 }

@@ -16,12 +16,12 @@
 package science.atlarge.graphalytics.neo4j.algolib.sssp;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.SingleSourceShortestPathsParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for executing the single source shortest paths algorithm.
@@ -30,21 +30,23 @@ import java.net.URL;
  */
 public class SingleSourceShortestPathsJob extends Neo4jJob {
 
-	private final SingleSourceShortestPathsParameters parameters;
+    private final SingleSourceShortestPathsParameters parameters;
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 * @param parameters     algorithm-specific parameters, must be of type SingleSourceShortestPathsParameters
-	 */
-	public SingleSourceShortestPathsJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (SingleSourceShortestPathsParameters) parameters;
-	}
+    public SingleSourceShortestPathsJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+                                        String inputPath, String outputPath) {
+        super(runSpecification, platformConfig, inputPath, outputPath);
+        this.parameters = (SingleSourceShortestPathsParameters)runSpecification
+                .getBenchmarkRun()
+                .getAlgorithmParameters();
+    }
 
-	@Override
-	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
-		new SingleSourceShortestPathsComputation(graphDatabase, parameters.getSourceVertex(), graph.isDirected()).run();
-	}
+    @Override
+    public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException {
+        new SingleSourceShortestPathsComputation(
+                graphDatabase,
+                parameters.getSourceVertex(),
+                graph.isDirected()
+        ).run();
+    }
 
 }

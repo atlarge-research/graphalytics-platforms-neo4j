@@ -38,12 +38,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.pr.PageRankComputati
 public class PageRankComputationTest extends PageRankValidationTest {
 
 	@Override
-	public PageRankOutput executeDirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws Exception {
+	public PageRankOutput executeDirectedPageRank(GraphStructure graph, PageRankParameters parameters) {
 		return executePagerank(graph, parameters);
 	}
 
 	@Override
-	public PageRankOutput executeUndirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws Exception {
+	public PageRankOutput executeUndirectedPageRank(GraphStructure graph, PageRankParameters parameters) {
 		return executePagerank(graph, parameters);
 	}
 

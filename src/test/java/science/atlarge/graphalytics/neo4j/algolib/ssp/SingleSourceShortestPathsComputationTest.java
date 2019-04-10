@@ -16,6 +16,7 @@
 package science.atlarge.graphalytics.neo4j.algolib.ssp;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.SingleSourceShortestPathsParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.neo4j.algolib.sssp.SingleSourceShortestPathsComputation;
@@ -35,7 +36,7 @@ public class SingleSourceShortestPathsComputationTest extends SingleSourceShorte
     @Override
     public SingleSourceShortestPathsOutput executeDirectedSingleSourceShortestPaths(
             PropertyGraph<Void, Double> graph,
-            SingleSourceShortestPathsParameters parameters) throws Exception {
+            SingleSourceShortestPathsParameters parameters) throws KernelException {
         return execute(graph, parameters, true);
 
     }
@@ -43,13 +44,13 @@ public class SingleSourceShortestPathsComputationTest extends SingleSourceShorte
     @Override
     public SingleSourceShortestPathsOutput executeUndirectedSingleSourceShortestPaths(
             PropertyGraph<Void, Double> graph,
-            SingleSourceShortestPathsParameters parameters) throws Exception {
+            SingleSourceShortestPathsParameters parameters) throws KernelException {
         return execute(graph, parameters, false);
     }
 
     private SingleSourceShortestPathsOutput execute(PropertyGraph<Void, Double> graph,
                                                     SingleSourceShortestPathsParameters parameters,
-                                                    boolean directed) throws Exception {
+                                                    boolean directed) throws KernelException {
         GraphDatabaseService graphDatabase = ValidationGraphLoader.loadValidationGraphToDatabase(graph);
 
         Map<Long, Double> pathLengths =

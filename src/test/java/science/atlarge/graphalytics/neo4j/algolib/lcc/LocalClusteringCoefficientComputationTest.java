@@ -18,7 +18,7 @@ package science.atlarge.graphalytics.neo4j.algolib.lcc;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.lcc.LocalClusteringCoefficientOutput;
@@ -38,14 +38,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.lcc.LocalClusteringC
 public class LocalClusteringCoefficientComputationTest extends LocalClusteringCoefficientValidationTest {
 
 	@Override
-	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph)
-			throws Exception {
+	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph) throws KernelException {
 		return executeLocalClusteringCoefficient(graph, true);
 	}
 
 	@Override
-	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph)
-			throws Exception {
+	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph) throws KernelException {
 		return executeLocalClusteringCoefficient(graph, false);
 	}
 

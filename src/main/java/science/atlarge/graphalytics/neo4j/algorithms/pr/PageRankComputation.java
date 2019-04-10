@@ -52,7 +52,7 @@ public class PageRankComputation {
 	 * @param numberOfVertices the number of vertices in the graph
 	 */
 	public PageRankComputation(GraphDatabaseService graphDatabase, int maxIterations, float dampingFactor,
-			int numberOfVertices) {
+                               int numberOfVertices) {
 		this.graphDatabase = graphDatabase;
 		this.maxIterations = maxIterations;
 		this.dampingFactor = dampingFactor;

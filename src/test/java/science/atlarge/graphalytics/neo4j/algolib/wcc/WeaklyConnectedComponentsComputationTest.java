@@ -18,7 +18,7 @@ package science.atlarge.graphalytics.neo4j.algolib.wcc;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
 import science.atlarge.graphalytics.validation.algorithms.wcc.WeaklyConnectedComponentsOutput;
@@ -39,12 +39,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.wcc.WeaklyConnectedC
 public class WeaklyConnectedComponentsComputationTest extends WeaklyConnectedComponentsValidationTest {
 
 	@Override
-	public WeaklyConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws KernelException {
 		return executeConnectedComponents(graph);
 	}
 
 	@Override
-	public WeaklyConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws KernelException {
 		return executeConnectedComponents(graph);
 	}
 

@@ -15,48 +15,101 @@
  */
 package science.atlarge.graphalytics.neo4j;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
+import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.BenchmarkRunSetup;
+import science.atlarge.graphalytics.execution.RunSpecification;
 
-import java.net.URL;
+import java.io.IOException;
+
 
 /**
- * Generic Neo4j job configuration. This class is responsible for initializing a Neo4j database and executing the
- * algorithm-specific computation provided by the inheriting subclass.
+ * Base class for all jobs in the platform driver. Configures and executes a platform job using the parameters
+ * and executable specified by the subclass for a specific algorithm.
  *
- * @author Tim Hegeman
+ * @author Gábor Szárnyas
  */
 public abstract class Neo4jJob {
+    // Path to the Neo4j configuration
+    private static final String PROPERTIES_PATH = "/neo4j.properties";
 
-	private final String databasePath;
-	private final URL propertiesFile;
+    private static final Logger LOG = LogManager.getLogger();
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 */
-	public Neo4jJob(String databasePath, URL propertiesFile) {
-		this.propertiesFile = propertiesFile;
-		this.databasePath = databasePath;
-	}
+    private final String jobId;
+    private final String logPath;
+    protected final String inputPath;
+    protected final String outputPath;
 
-	/**
-	 * Opens the Neo4j database, executes the algorithm-specific computation, and shuts down the database.
-	 *
-	 * @param graph the graph type to be computed
-	 */
-	public void run(Graph graph) throws KernelException {
-		try (Neo4jDatabase graphDatabase = new Neo4jDatabase(databasePath, propertiesFile)) {
-			runComputation(graphDatabase.get(), graph);
-		}
-	}
+    private final Graph graph;
+    private final Neo4jDatabase database;
 
-	/**
-	 * Hook for the algorithm-specific computation, to be executed using the provided Neo4j database.
-	 *
-	 * @param graphDatabase a Neo4j graph database
-	 */
-	public abstract void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws KernelException;
+    /**
+     * Initializes the platform job with its parameters.
+     *
+     * @param runSpecification the benchmark run specification.
+     * @param platformConfig   the platform configuration.
+     * @param inputPath        the file path of the input graph dataset.
+     * @param outputPath       the file path of the output graph dataset.
+     */
+    public Neo4jJob(RunSpecification runSpecification,
+                    Neo4jConfiguration platformConfig,
+                    String inputPath,
+                    String outputPath) {
+
+        BenchmarkRun benchmarkRun = runSpecification.getBenchmarkRun();
+        BenchmarkRunSetup benchmarkRunSetup = runSpecification.getBenchmarkRunSetup();
+
+        this.jobId = benchmarkRun.getId();
+        this.logPath = benchmarkRunSetup.getLogDir().resolve("platform").toString();
+
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
+
+        this.graph = benchmarkRun.getGraph();
+
+        LOG.info("Starting database from path: " + inputPath);
+        this.database = new Neo4jDatabase(
+                inputPath,
+                Neo4jJob.class.getResource(PROPERTIES_PATH)
+        );
+    }
+
+    /**
+     * Executes the platform job with the pre-defined parameters.
+     *
+     * @return the exit code
+     */
+    public int execute() throws KernelException, IOException {
+        runComputation(
+                database.get(),
+                graph
+        );
+        return 0;
+    }
+
+    public abstract void runComputation(
+            GraphDatabaseService graphDatabase,
+            Graph graph
+    ) throws KernelException, IOException;
+
+    private String getJobId() {
+        return jobId;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    private String getInputPath() {
+        return inputPath;
+    }
+
+    private String getOutputPath() {
+        return outputPath;
+    }
 
 }

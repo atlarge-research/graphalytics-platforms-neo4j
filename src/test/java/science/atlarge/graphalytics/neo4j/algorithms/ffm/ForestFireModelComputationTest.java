@@ -41,13 +41,13 @@ public class ForestFireModelComputationTest extends ForestFireModelValidationTes
 
 	@Override
 	public GraphStructure executeDirectedForestFireModel(GraphStructure graph,
-			ForestFireModelParameters parameters) throws Exception {
+			ForestFireModelParameters parameters) {
 		return executeForestFireModel(graph, parameters, true);
 	}
 
 	@Override
 	public GraphStructure executeUndirectedForestFireModel(GraphStructure graph,
-			ForestFireModelParameters parameters) throws Exception {
+			ForestFireModelParameters parameters) {
 		return executeForestFireModel(graph, parameters, false);
 	}
 
@@ -59,7 +59,7 @@ public class ForestFireModelComputationTest extends ForestFireModelValidationTes
 		Map<Long, Set<Long>> edgeLists = new HashMap<>();
 		try (Transaction ignored = database.beginTx()) {
 			for (Node node : database.getAllNodes()) {
-				edgeLists.put((long)node.getProperty(ID_PROPERTY), new HashSet<Long>());
+				edgeLists.put((long)node.getProperty(ID_PROPERTY), new HashSet<>());
 			}
 			for (Relationship relationship : database.getAllRelationships()) {
 				if (relationship.isType(EDGE)) {

@@ -37,14 +37,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.lcc.LocalClusteringC
 public class LocalClusteringCoefficientComputationTest extends LocalClusteringCoefficientValidationTest {
 
 	@Override
-	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph)
-			throws Exception {
+	public LocalClusteringCoefficientOutput executeDirectedLocalClusteringCoefficient(GraphStructure graph) {
 		return executeLocalClusteringCoefficient(graph);
 	}
 
 	@Override
-	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph)
-			throws Exception {
+	public LocalClusteringCoefficientOutput executeUndirectedLocalClusteringCoefficient(GraphStructure graph) {
 		return executeLocalClusteringCoefficient(graph);
 	}
 

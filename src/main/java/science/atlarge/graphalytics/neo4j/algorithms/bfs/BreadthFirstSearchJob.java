@@ -18,9 +18,13 @@ package science.atlarge.graphalytics.neo4j.algorithms.bfs;
 import org.neo4j.graphdb.GraphDatabaseService;
 import science.atlarge.graphalytics.domain.algorithms.BreadthFirstSearchParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
+import science.atlarge.graphalytics.neo4j.ProcTimeLog;
+import science.atlarge.graphalytics.neo4j.serializer.BreadthFirstSearchSerializer;
 
-import java.net.URL;
+import java.io.IOException;
 
 /**
  * Neo4j job configuration for executing the breadth-first search algorithm.
@@ -29,21 +33,32 @@ import java.net.URL;
  */
 public class BreadthFirstSearchJob extends Neo4jJob {
 
-	private final BreadthFirstSearchParameters parameters;
+    private static final String DISTANCE = "DISTANCE";
 
-	/**
-	 * @param databasePath   path to the Neo4j database representing the graph
-	 * @param propertiesFile URL of a neo4j.properties file to load from
-	 * @param parameters     algorithm-specific parameters, must be of type BreadthFirstSearchParameters
-	 */
-	public BreadthFirstSearchJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (BreadthFirstSearchParameters) parameters;
-	}
+    BreadthFirstSearchParameters parameters;
 
-	@Override
-	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new BreadthFirstSearchComputation(graphDatabase, parameters.getSourceVertex(), graph.isDirected()).run();
-	}
+    public BreadthFirstSearchJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+                                 String inputPath, String outputPath) {
+        super(runSpecification, platformConfig, inputPath, outputPath);
+        this.parameters = (BreadthFirstSearchParameters) runSpecification
+                .getBenchmarkRun()
+                .getAlgorithmParameters();
+    }
+
+    @Override
+    public void runComputation(GraphDatabaseService graphDatabase, Graph graph) throws IOException {
+        ProcTimeLog.start();
+        new BreadthFirstSearchComputation(
+                graphDatabase,
+                parameters.getSourceVertex(),
+                graph.isDirected()
+        ).run();
+        ProcTimeLog.end();
+
+        BreadthFirstSearchSerializer.serialize(
+                graphDatabase,
+                outputPath
+        );
+    }
 
 }

@@ -39,13 +39,13 @@ public class CommunityDetectionLPComputationTest extends CommunityDetectionLPVal
 
 	@Override
 	public CommunityDetectionLPOutput executeDirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionLPParameters parameters) throws Exception {
+			CommunityDetectionLPParameters parameters) {
 		return executeCommunityDetection(graph, parameters);
 	}
 
 	@Override
 	public CommunityDetectionLPOutput executeUndirectedCommunityDetection(GraphStructure graph,
-			CommunityDetectionLPParameters parameters) throws Exception {
+			CommunityDetectionLPParameters parameters) {
 		return executeCommunityDetection(graph, parameters);
 	}
 

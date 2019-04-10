@@ -37,12 +37,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.wcc.WeaklyConnectedC
 public class WeaklyConnectedComponentsComputationTest extends WeaklyConnectedComponentsValidationTest {
 
 	@Override
-	public WeaklyConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeDirectedConnectedComponents(GraphStructure graph) {
 		return executeConnectedComponents(graph);
 	}
 
 	@Override
-	public WeaklyConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) throws Exception {
+	public WeaklyConnectedComponentsOutput executeUndirectedConnectedComponents(GraphStructure graph) {
 		return executeConnectedComponents(graph);
 	}
 

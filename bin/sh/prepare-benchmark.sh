@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright 2015 Delft University of Technology
 #
@@ -15,23 +15,11 @@
 # limitations under the License.
 #
 
-
 # Ensure the configuration file exists
-if [ ! -f "$config/neo4j.properties" ]; then
-	echo "Missing mandatory configuration file: $config/neo4j.properties" >&2
+if [ ! -f "$config/platform.properties" ]; then
+	echo "Missing mandatory configuration file: $config/platform.properties" >&2
 	exit 1
 fi
 
-# Get the first specification of jvm.heap.size.mb
-heapsize=$(grep -E "^jvm\.heap\.size\.mb[	 ]*[:=]" $config/neo4j.properties | sed 's/jvm\.heap\.size\.mb[\t ]*[:=][\t ]*\([^\t ]*\).*/\1/g' | head -n 1)
-if [ "h$heapsize" = "h" ]; then
-	echo "Invalid definition of jvm.heap.size.mb: $heapsize" >&2
-	exit 1
-fi
-echo "Using heap size: $heapsize"
-
-export java_opts="-Xmx${heapsize}m -Xms${heapsize}m -XX:+UseG1GC"
-
-export platform="neo4j"
-export platform_classpath=
-
+# Set library jar
+export LIBRARY_JAR=`ls lib/graphalytics-*default*.jar`

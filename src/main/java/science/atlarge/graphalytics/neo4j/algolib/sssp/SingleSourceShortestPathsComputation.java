@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.neo4j.graphalgo.ShortestPathProc;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 import science.atlarge.graphalytics.neo4j.algolib.AlgoLibHelper;
@@ -46,7 +46,11 @@ public class SingleSourceShortestPathsComputation {
     /**
      * @param graphDatabase graph database representing the input graph
      */
-    public SingleSourceShortestPathsComputation(GraphDatabaseService graphDatabase, long startVertexId, boolean directed) throws KernelException {
+    public SingleSourceShortestPathsComputation(
+            GraphDatabaseService graphDatabase,
+            long startVertexId,
+            boolean directed
+    ) throws KernelException {
         this.graphDatabase = graphDatabase;
         this.startVertexId = startVertexId;
         this.directed = directed;

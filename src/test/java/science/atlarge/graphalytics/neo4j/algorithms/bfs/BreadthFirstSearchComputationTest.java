@@ -39,13 +39,13 @@ public class BreadthFirstSearchComputationTest extends BreadthFirstSearchValidat
 
 	@Override
 	public BreadthFirstSearchOutput executeDirectedBreadthFirstSearch(GraphStructure graph,
-			BreadthFirstSearchParameters parameters) throws Exception {
+			BreadthFirstSearchParameters parameters) {
 		return executeBreadthFirstSearch(graph, parameters, true);
 	}
 
 	@Override
 	public BreadthFirstSearchOutput executeUndirectedBreadthFirstSearch(GraphStructure graph,
-			BreadthFirstSearchParameters parameters) throws Exception {
+			BreadthFirstSearchParameters parameters) {
 		return executeBreadthFirstSearch(graph, parameters, true);
 	}
 

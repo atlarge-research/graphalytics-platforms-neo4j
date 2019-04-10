@@ -18,9 +18,9 @@ package science.atlarge.graphalytics.neo4j.algorithms.ffm;
 import org.neo4j.graphdb.GraphDatabaseService;
 import science.atlarge.graphalytics.domain.algorithms.ForestFireModelParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for executing the forest fire model for graph evolution.
@@ -31,19 +31,21 @@ public class ForestFireModelJob extends Neo4jJob {
 
 	private final ForestFireModelParameters parameters;
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 * @param parameters     a ForestFireModelParameters object specifying the model-specific parameters
-	 */
-	public ForestFireModelJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (ForestFireModelParameters) parameters;
+	public ForestFireModelJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+							  String inputPath, String outputPath) {
+		super(runSpecification, platformConfig, inputPath, outputPath);
+		this.parameters = (ForestFireModelParameters)runSpecification
+				.getBenchmarkRun()
+				.getAlgorithmParameters();
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new ForestFireModelComputation(graphDatabase, parameters, graph.isDirected());
+		new ForestFireModelComputation(
+				graphDatabase,
+				parameters,
+				graph.isDirected()
+		).run();
 	}
 
 }

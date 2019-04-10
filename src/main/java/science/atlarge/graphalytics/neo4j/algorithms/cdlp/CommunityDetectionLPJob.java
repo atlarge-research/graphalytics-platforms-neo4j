@@ -18,9 +18,9 @@ package science.atlarge.graphalytics.neo4j.algorithms.cdlp;
 import org.neo4j.graphdb.GraphDatabaseService;
 import science.atlarge.graphalytics.domain.algorithms.CommunityDetectionLPParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for executing the community detection algorithm.
@@ -31,19 +31,20 @@ public class CommunityDetectionLPJob extends Neo4jJob {
 
 	private final CommunityDetectionLPParameters parameters;
 
-	/**
-	 * @param databasePath   path to the Neo4j database representing the graph
-	 * @param propertiesFile URL of a neo4j.properties file to load from
-	 * @param parameters     algorithm-specific parameters, must be of type BreadthFirstSearchParameters
-	 */
-	public CommunityDetectionLPJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (CommunityDetectionLPParameters)parameters;
+	public CommunityDetectionLPJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+								   String inputPath, String outputPath) {
+		super(runSpecification, platformConfig, inputPath, outputPath);
+		this.parameters = (CommunityDetectionLPParameters)runSpecification
+				.getBenchmarkRun()
+				.getAlgorithmParameters();
 	}
 
 	@Override
 	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new CommunityDetectionLPComputation(graphDatabase, parameters.getMaxIterations()).run();
+		new CommunityDetectionLPComputation(
+				graphDatabase,
+				parameters.getMaxIterations()
+		).run();
 	}
 
 }

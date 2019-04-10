@@ -18,11 +18,7 @@ package science.atlarge.graphalytics.neo4j.algorithms.wcc;
 import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.*;
 import science.atlarge.graphalytics.neo4j.Neo4jTransactionManager;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.EDGE;

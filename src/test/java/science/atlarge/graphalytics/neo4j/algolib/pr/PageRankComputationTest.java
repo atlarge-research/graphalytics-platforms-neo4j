@@ -18,7 +18,7 @@ package science.atlarge.graphalytics.neo4j.algolib.pr;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.PageRankParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
 import science.atlarge.graphalytics.validation.GraphStructure;
@@ -39,12 +39,12 @@ import static science.atlarge.graphalytics.neo4j.algorithms.pr.PageRankComputati
 public class PageRankComputationTest extends PageRankValidationTest {
 
 	@Override
-	public PageRankOutput executeDirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws Exception {
+	public PageRankOutput executeDirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws KernelException {
 		return executePagerank(graph, parameters, true);
 	}
 
 	@Override
-	public PageRankOutput executeUndirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws Exception {
+	public PageRankOutput executeUndirectedPageRank(GraphStructure graph, PageRankParameters parameters) throws KernelException {
 		return executePagerank(graph, parameters, false);
 	}
 

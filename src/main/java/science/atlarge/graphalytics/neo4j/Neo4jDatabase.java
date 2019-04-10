@@ -17,7 +17,6 @@ package science.atlarge.graphalytics.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.kernel.api.exceptions.KernelException;
 
 import java.io.File;
 import java.net.URL;
@@ -38,7 +37,7 @@ public class Neo4jDatabase implements AutoCloseable {
 	 * @param databasePath   the path of the pre-loaded graph database
 	 * @param propertiesFile a Neo4j properties file
 	 */
-	public Neo4jDatabase(String databasePath, URL propertiesFile) throws KernelException {
+	public Neo4jDatabase(String databasePath, URL propertiesFile) {
 		this.graphDatabase = new GraphDatabaseFactory()
 				.newEmbeddedDatabaseBuilder(new File(databasePath))
 				.loadPropertiesFromURL(propertiesFile)
@@ -56,5 +55,7 @@ public class Neo4jDatabase implements AutoCloseable {
 	public void close() {
 		graphDatabase.shutdown();
 	}
+
+
 
 }

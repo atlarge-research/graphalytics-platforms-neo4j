@@ -25,11 +25,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
 
@@ -123,7 +119,7 @@ public abstract class AbstractComputationTest {
 
 	private static void addVertex(long vertexId, Map<Long, Set<Long>> edges) {
 		if (!edges.containsKey(vertexId)) {
-			edges.put(vertexId, new HashSet<Long>());
+			edges.put(vertexId, new HashSet<>());
 		}
 	}
 

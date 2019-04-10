@@ -18,9 +18,9 @@ package science.atlarge.graphalytics.neo4j.algorithms.pr;
 import org.neo4j.graphdb.GraphDatabaseService;
 import science.atlarge.graphalytics.domain.algorithms.PageRankParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for calculating the PageRank values of nodes in a graph.
@@ -29,21 +29,24 @@ import java.net.URL;
  */
 public class PageRankJob extends Neo4jJob {
 
-	private final PageRankParameters parameters;
+    PageRankParameters parameters;
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 */
-	public PageRankJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (PageRankParameters)parameters;
-	}
+    public PageRankJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+                       String inputPath, String outputPath) {
+        super(runSpecification, platformConfig, inputPath, outputPath);
+        this.parameters = (PageRankParameters) runSpecification
+                .getBenchmarkRun()
+                .getAlgorithmParameters();
+    }
 
-	@Override
-	public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
-		new PageRankComputation(graphDatabase, parameters.getNumberOfIterations(), parameters.getDampingFactor(),
-				(int)graph.getNumberOfVertices()).run();
-	}
+    @Override
+    public void runComputation(GraphDatabaseService graphDatabase, Graph graph) {
+        new PageRankComputation(
+                graphDatabase,
+                parameters.getNumberOfIterations(),
+                parameters.getDampingFactor(),
+                (int) graph.getNumberOfVertices()
+        ).run();
+    }
 
 }

@@ -16,12 +16,12 @@
 package science.atlarge.graphalytics.neo4j.algolib.pr;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.PageRankParameters;
 import science.atlarge.graphalytics.domain.graph.Graph;
+import science.atlarge.graphalytics.execution.RunSpecification;
+import science.atlarge.graphalytics.neo4j.Neo4jConfiguration;
 import science.atlarge.graphalytics.neo4j.Neo4jJob;
-
-import java.net.URL;
 
 /**
  * Neo4j job configuration for calculating the PageRank values of nodes in a graph.
@@ -32,13 +32,12 @@ public class PageRankJob extends Neo4jJob {
 
 	private final PageRankParameters parameters;
 
-	/**
-	 * @param databasePath   the path of the pre-loaded graph database
-	 * @param propertiesFile a Neo4j properties file
-	 */
-	public PageRankJob(String databasePath, URL propertiesFile, Object parameters) {
-		super(databasePath, propertiesFile);
-		this.parameters = (PageRankParameters) parameters;
+	public PageRankJob(RunSpecification runSpecification, Neo4jConfiguration platformConfig,
+					   String inputPath, String outputPath) {
+		super(runSpecification, platformConfig, inputPath, outputPath);
+		this.parameters = (PageRankParameters)runSpecification
+				.getBenchmarkRun()
+				.getAlgorithmParameters();
 	}
 
 	@Override
