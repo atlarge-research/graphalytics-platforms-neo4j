@@ -70,13 +70,13 @@ done
 rm -rf ${OUTPUT_PATH}
 mkdir -p ${OUTPUT_PATH}
 
-sed "1i id:ID" ${INPUT_VERTEX_PATH} > ${OUTPUT_PATH}/vertex.csv
+sed "1i VID:ID" ${INPUT_VERTEX_PATH} > ${OUTPUT_PATH}/vertex.csv
 case ${WEIGHTED} in
     "true")
         sed "1i :START_ID :END_ID weight:DOUBLE" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
         ;;
     "false")
-        sed "1i :START_ID :END_ID weight:DOUBLE" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
+        sed "1i :START_ID :END_ID" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
         ;;
     *)
         echo "Bad weight parameter" >&2
@@ -86,6 +86,6 @@ esac
 ${NEO4J_HOME}/bin/neo4j-import \
   --into "$OUTPUT_PATH/database" \
   --id-type=INTEGER \
-  --nodes "$OUTPUT_PATH/vertex.csv" \
-  --relationships:REL "$OUTPUT_PATH/edge.csv" \
+  --nodes:Vertex "$OUTPUT_PATH/vertex.csv" \
+  --relationships:EDGE "$OUTPUT_PATH/edge.csv" \
   --delimiter ' '
