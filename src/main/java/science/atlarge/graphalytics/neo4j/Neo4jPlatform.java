@@ -22,12 +22,9 @@ import science.atlarge.graphalytics.domain.benchmark.BenchmarkRun;
 import science.atlarge.graphalytics.domain.graph.FormattedGraph;
 import science.atlarge.graphalytics.domain.graph.LoadedGraph;
 import science.atlarge.graphalytics.execution.*;
-import science.atlarge.graphalytics.neo4j.algolib.sssp.SingleSourceShortestPathsJob;
-import science.atlarge.graphalytics.neo4j.algorithms.bfs.BreadthFirstSearchJob;
-import science.atlarge.graphalytics.neo4j.algorithms.cdlp.CommunityDetectionLPJob;
-import science.atlarge.graphalytics.neo4j.algorithms.lcc.LocalClusteringCoefficientJob;
-import science.atlarge.graphalytics.neo4j.algorithms.pr.PageRankJob;
-import science.atlarge.graphalytics.neo4j.algorithms.wcc.WeaklyConnectedComponentsJob;
+import science.atlarge.graphalytics.neo4j.metrics.AbstractNeo4jJobFactory;
+import science.atlarge.graphalytics.neo4j.metrics.algolib.AlgolibNeo4jJobFactory;
+import science.atlarge.graphalytics.neo4j.metrics.embedded.EmbeddedNeo4jJobFactory;
 import science.atlarge.graphalytics.report.result.BenchmarkMetrics;
 
 import java.nio.file.Path;
@@ -37,11 +34,12 @@ import java.nio.file.Paths;
  * Neo4j platform driver for the Graphalytics benchmark.
  *
  * @author Gábor Szárnyas
+ * @author Bálint Hegyi
  */
 public class Neo4jPlatform implements Platform {
 
 	protected static final Logger LOG = LogManager.getLogger();
-	public static final String PLATFORM_NAME = "neo4j";
+	private static final String PLATFORM_NAME = "neo4j";
 
 	public Neo4jLoader loader;
 
@@ -107,25 +105,41 @@ public class Neo4jPlatform implements Platform {
 		String inputPath = runtimeSetup.getLoadedGraph().getLoadedPath();
 		String outputPath = benchmarkRunSetup.getOutputDir().resolve(benchmarkRun.getName()).toAbsolutePath().toString();
 
+		AbstractNeo4jJobFactory jobFactory;
+		switch (platformConfig.getBenchmarkImplementation()) {
+			case ALGOLIB:
+				jobFactory = new AlgolibNeo4jJobFactory(
+						runSpecification, platformConfig, inputPath, outputPath
+				);
+				break;
+			case EMBEDDED:
+				jobFactory = new EmbeddedNeo4jJobFactory(
+						runSpecification, platformConfig, inputPath, outputPath
+				);
+				break;
+			default:
+				throw new PlatformExecutionException("Benchmark implementation is not defined");
+		}
+
 		Neo4jJob job;
 		switch (algorithm) {
 			case BFS:
-				job = new BreadthFirstSearchJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createBfsJob();
 				break;
 			case CDLP:
-				job = new CommunityDetectionLPJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createCdlpJob();
 				break;
 			case LCC:
-				job = new LocalClusteringCoefficientJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createLccJob();
 				break;
 			case PR:
-				job = new PageRankJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createPrJob();
 				break;
 			case WCC:
-				job = new WeaklyConnectedComponentsJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createWccJob();
 				break;
 			case SSSP:
-				job = new SingleSourceShortestPathsJob(runSpecification, platformConfig, inputPath, outputPath);
+				job = jobFactory.createSsspJob();
 				break;
 			default:
 				throw new PlatformExecutionException("Failed to load algorithm implementation.");

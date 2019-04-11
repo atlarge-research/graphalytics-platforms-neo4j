@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
+import static science.atlarge.graphalytics.neo4j.Neo4jConstants.VertexLabelEnum.Vertex;
 
 /**
  * Base class for testing Neo4j jobs. This class is responsible for creating and cleaning up test databases, doing
@@ -37,7 +37,7 @@ import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelE
  */
 public abstract class AbstractComputationTest {
 
-	protected GraphDatabaseService graphDatabase;
+	private GraphDatabaseService graphDatabase;
 	private Map<Long, Long> vertexToNodeIds;
 
 	@Before
@@ -65,14 +65,14 @@ public abstract class AbstractComputationTest {
 			for (long vertexId : vertices) {
 				Node newNode = graphDatabase.createNode();
 				newNode.addLabel(Vertex);
-				newNode.setProperty(Neo4jConfiguration.ID_PROPERTY, vertexId);
+				newNode.setProperty(Neo4jConstants.ID_PROPERTY, vertexId);
 				nodes.put(vertexId, newNode);
 				vertexToNodeIds.put(vertexId, newNode.getId());
 			}
 
 			for (long sourceId : edges.keySet()) {
 				for (long destinationId : edges.get(sourceId)) {
-					nodes.get(sourceId).createRelationshipTo(nodes.get(destinationId), Neo4jConfiguration.EDGE);
+					nodes.get(sourceId).createRelationshipTo(nodes.get(destinationId), Neo4jConstants.EDGE);
 				}
 			}
 			transaction.success();
@@ -97,17 +97,17 @@ public abstract class AbstractComputationTest {
 		vertexToNodeIds.clear();
 		try (Transaction ignored = graphDatabase.beginTx()) {
 			for (Node node : graphDatabase.getAllNodes()) {
-				vertexToNodeIds.put((long)node.getProperty(Neo4jConfiguration.ID_PROPERTY), node.getId());
+				vertexToNodeIds.put((long)node.getProperty(Neo4jConstants.ID_PROPERTY), node.getId());
 			}
 		}
 	}
 
 	private static void parseGraphLineToEdges(String line, Map<Long, Set<Long>> edges) {
 		String[] tokens = line.split(" ");
-		Long sourceId = Long.parseLong(tokens[0]);
+		long sourceId = Long.parseLong(tokens[0]);
 		addVertex(sourceId, edges);
 		for (int i = 1; i < tokens.length; i++) {
-			Long destinationId = Long.parseLong(tokens[i]);
+			long destinationId = Long.parseLong(tokens[i]);
 			addEdge(sourceId, destinationId, edges);
 		}
 	}

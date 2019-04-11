@@ -18,129 +18,143 @@ package science.atlarge.graphalytics.neo4j;
 import org.apache.commons.configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.RelationshipType;
 import science.atlarge.graphalytics.configuration.ConfigurationUtil;
 import science.atlarge.graphalytics.configuration.GraphalyticsExecutionException;
 
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Collection of configurable platform options.
  *
  * @author Gábor Szárnyas
+ * @author Bálint Hegyi
  */
 public final class Neo4jConfiguration {
 
-	protected static final Logger LOG = LogManager.getLogger();
+    protected static final Logger LOG = LogManager.getLogger();
 
-	public static final RelationshipType EDGE = RelationshipType.withName("EDGE");
-	public static final String ID_PROPERTY = "VID";
-	public static final String WEIGHT_PROPERTY = "WEIGHT";
+    private static final String BENCHMARK_PROPERTIES_FILE = "benchmark.properties";
+    private static final String HOME_PATH_KEY = "platform.neo4j.home";
+    private static final String BENCHMARK_IMPL_KEY = "benchmark.impl";
 
-	public enum VertexLabelEnum implements Label {
-		Vertex
-	}
+    public enum BenchmarkImplementation {
+        ALGOLIB,
+        EMBEDDED
+    }
 
-	private static final String BENCHMARK_PROPERTIES_FILE = "benchmark.properties";
-	private static final String HOME_PATH_KEY = "platform.neo4j.home";
+    private String loaderPath;
+    private String unloaderPath;
+    private String executablePath;
+    private String terminatorPath;
+    private String homePath;
+    private BenchmarkImplementation benchmarkImplementation;
 
-	private String loaderPath;
-	private String unloaderPath;
-	private String executablePath;
-	private String terminatorPath;
-	private String homePath;
+    /**
+     * Creates a new Neo4jConfiguration object to capture all platform parameters that are not specific to any algorithm.
+     */
+    public Neo4jConfiguration() {
+    }
 
-	/**
-	 * Creates a new Neo4jConfiguration object to capture all platform parameters that are not specific to any algorithm.
-	 */
-	public Neo4jConfiguration(){
-	}
+    public String getLoaderPath() {
+        return loaderPath;
+    }
 
-	public String getLoaderPath() {
-		return loaderPath;
-	}
+    public void setLoaderPath(String loaderPath) {
+        this.loaderPath = loaderPath;
+    }
 
-	public void setLoaderPath(String loaderPath) {
-		this.loaderPath = loaderPath;
-	}
+    public String getUnloaderPath() {
+        return unloaderPath;
+    }
 
-	public String getUnloaderPath() {
-		return unloaderPath;
-	}
+    public void setUnloaderPath(String unloaderPath) {
+        this.unloaderPath = unloaderPath;
+    }
 
-	public void setUnloaderPath(String unloaderPath) {
-		this.unloaderPath = unloaderPath;
-	}
+    /**
+     * @param executablePath the directory containing executables
+     */
+    public void setExecutablePath(String executablePath) {
+        this.executablePath = executablePath;
+    }
 
-	/**
-	 * @param executablePath the directory containing executables
-	 */
-	public void setExecutablePath(String executablePath) {
-		this.executablePath = executablePath;
-	}
+    /**
+     * @return the directory containing executables
+     */
+    public String getExecutablePath() {
+        return executablePath;
+    }
 
-	/**
-	 * @return the directory containing executables
-	 */
-	public String getExecutablePath() {
-		return executablePath;
-	}
+    public String getTerminatorPath() {
+        return terminatorPath;
+    }
 
-	public String getTerminatorPath() {
-		return terminatorPath;
-	}
+    public void setTerminatorPath(String terminatorPath) {
+        this.terminatorPath = terminatorPath;
+    }
 
-	public void setTerminatorPath(String terminatorPath) {
-		this.terminatorPath = terminatorPath;
-	}
+    /**
+     * @return the home directory
+     */
+    public String getHomePath() {
+        return homePath;
+    }
 
-	/**
-	 * @return the home directory
-	 */
-	public String getHomePath() {
-		return homePath;
-	}
+    /**
+     * @param homePath the home directory
+     */
+    public void setHomePath(String homePath) {
+        this.homePath = homePath;
+    }
 
-	/**
-	 * @param homePath the home directory
-	 */
-	public void setHomePath(String homePath) {
-		this.homePath = homePath;
-	}
+    public BenchmarkImplementation getBenchmarkImplementation() {
+        return benchmarkImplementation;
+    }
 
+    public void setBenchmarkImplementation(BenchmarkImplementation benchmarkImplementation) {
+        this.benchmarkImplementation = benchmarkImplementation;
+    }
 
-	public static Neo4jConfiguration parsePropertiesFile() {
+    public static Neo4jConfiguration parsePropertiesFile() {
 
-		Neo4jConfiguration platformConfig = new Neo4jConfiguration();
+        Neo4jConfiguration platformConfig = new Neo4jConfiguration();
 
-		Configuration configuration = null;
-		try {
-			configuration = ConfigurationUtil.loadConfiguration(BENCHMARK_PROPERTIES_FILE);
-		} catch (Exception e) {
-			LOG.warn(String.format("Failed to load configuration from %s", BENCHMARK_PROPERTIES_FILE));
-			throw new GraphalyticsExecutionException("Failed to load configuration. Benchmark run aborted.", e);
-		}
+        Configuration configuration = null;
+        try {
+            configuration = ConfigurationUtil.loadConfiguration(BENCHMARK_PROPERTIES_FILE);
+        } catch (Exception e) {
+            LOG.warn(String.format("Failed to load configuration from %s", BENCHMARK_PROPERTIES_FILE));
+            throw new GraphalyticsExecutionException("Failed to load configuration. Benchmark run aborted.", e);
+        }
 
-		String loaderPath = Paths.get("./bin/sh/load-graph.sh").toString();
-		platformConfig.setLoaderPath(loaderPath);
+        String loaderPath = Paths.get("./bin/sh/load-graph.sh").toString();
+        platformConfig.setLoaderPath(loaderPath);
 
-		String unloaderPath = Paths.get("./bin/sh/unload-graph.sh").toString();
-		platformConfig.setUnloaderPath(unloaderPath);
+        String unloaderPath = Paths.get("./bin/sh/unload-graph.sh").toString();
+        platformConfig.setUnloaderPath(unloaderPath);
 
-		String executablePath = Paths.get("./bin/sh/execute-job.sh").toString();
-		platformConfig.setExecutablePath(executablePath);
+        String executablePath = Paths.get("./bin/sh/execute-job.sh").toString();
+        platformConfig.setExecutablePath(executablePath);
 
-		String terminatorPath = Paths.get("./bin/sh/terminate-job.sh").toString();
-		platformConfig.setTerminatorPath(terminatorPath);
+        String terminatorPath = Paths.get("./bin/sh/terminate-job.sh").toString();
+        platformConfig.setTerminatorPath(terminatorPath);
 
+        String homePath = configuration.getString(HOME_PATH_KEY, null);
+        if (homePath != null) {
+            platformConfig.setHomePath(homePath);
+        }
 
-		String homePath = configuration.getString(HOME_PATH_KEY, null);
-		if (homePath != null) {
-			platformConfig.setHomePath(homePath);
-		}
+        String benchmarkImpl = configuration.getString(BENCHMARK_IMPL_KEY, null);
+        Objects.requireNonNull(
+                benchmarkImpl,
+                String.format("The key %s is not defined", BENCHMARK_IMPL_KEY)
+        );
+        platformConfig.setBenchmarkImplementation(
+                BenchmarkImplementation.valueOf(benchmarkImpl.toUpperCase())
+        );
 
-		return platformConfig;
-	}
+        return platformConfig;
+    }
 
 }

@@ -23,8 +23,7 @@ import science.atlarge.graphalytics.validation.GraphStructure;
 import java.util.HashMap;
 import java.util.Map;
 
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.*;
-import static science.atlarge.graphalytics.neo4j.Neo4jConfiguration.VertexLabelEnum.Vertex;
+import static science.atlarge.graphalytics.neo4j.Neo4jConstants.VertexLabelEnum.Vertex;
 
 /**
  * Utility class for loading a validation graph into a Neo4j in-memory database.
@@ -42,14 +41,14 @@ public final class ValidationGraphLoader {
 			Map<Long, Node> vertexToNode = new HashMap<>();
 			for (long vertexId : validationGraph.getVertices()) {
 				Node newVertex = graphDatabase.createNode((Label)Vertex);
-				newVertex.setProperty(ID_PROPERTY, vertexId);
+				newVertex.setProperty(Neo4jConstants.ID_PROPERTY, vertexId);
 				vertexToNode.put(vertexId, newVertex);
 			}
 
 			for (long vertexId : validationGraph.getVertices()) {
 				Node sourceVertex = vertexToNode.get(vertexId);
 				for (long neighbourId : validationGraph.getEdgesForVertex(vertexId)) {
-					sourceVertex.createRelationshipTo(vertexToNode.get(neighbourId), EDGE);
+					sourceVertex.createRelationshipTo(vertexToNode.get(neighbourId), Neo4jConstants.EDGE);
 				}
 			}
 
@@ -65,7 +64,7 @@ public final class ValidationGraphLoader {
 			Map<PropertyGraph<V, E>.Vertex, Node> vertexToNode = new HashMap<>();
 			for (PropertyGraph<V, E>.Vertex vertex : graph.getVertices()) {
 				Node newVertex = graphDatabase.createNode((Label)Vertex);
-				newVertex.setProperty(ID_PROPERTY, vertex.getId());
+				newVertex.setProperty(Neo4jConstants.ID_PROPERTY, vertex.getId());
 				vertexToNode.put(vertex, newVertex);
 			}
 
@@ -74,8 +73,8 @@ public final class ValidationGraphLoader {
 
 				for (PropertyGraph<V, E>.Edge edge : vertex.getOutgoingEdges()) {
 					PropertyGraph<V, E>.Vertex destinationVertex = edge.getDestinationVertex();
-					Relationship rel = sourceVertex.createRelationshipTo(vertexToNode.get(destinationVertex), EDGE);
-					rel.setProperty(WEIGHT_PROPERTY, edge.getValue());
+					Relationship rel = sourceVertex.createRelationshipTo(vertexToNode.get(destinationVertex), Neo4jConstants.EDGE);
+					rel.setProperty(Neo4jConstants.WEIGHT_PROPERTY, edge.getValue());
 				}
 			}
 

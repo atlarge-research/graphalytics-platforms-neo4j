@@ -32,17 +32,17 @@ import java.io.IOException;
  * and executable specified by the subclass for a specific algorithm.
  *
  * @author Gábor Szárnyas
+ * @author Bálint Hegyi
  */
 public abstract class Neo4jJob {
     // Path to the Neo4j configuration
     private static final String PROPERTIES_PATH = "/neo4j.properties";
-
     private static final Logger LOG = LogManager.getLogger();
 
     private final String jobId;
     private final String logPath;
-    protected final String inputPath;
-    protected final String outputPath;
+    private final String inputPath;
+    private final String outputPath;
 
     private final Graph graph;
     private final Neo4jDatabase database;
@@ -84,32 +84,25 @@ public abstract class Neo4jJob {
      * @return the exit code
      */
     public int execute() throws KernelException, IOException {
-        runComputation(
+        compute(
                 database.get(),
                 graph
+        );
+        serialize(
+                database.get(),
+                outputPath
         );
         return 0;
     }
 
-    public abstract void runComputation(
+    protected abstract void compute(
             GraphDatabaseService graphDatabase,
             Graph graph
     ) throws KernelException, IOException;
 
-    private String getJobId() {
-        return jobId;
-    }
-
-    public String getLogPath() {
-        return logPath;
-    }
-
-    private String getInputPath() {
-        return inputPath;
-    }
-
-    private String getOutputPath() {
-        return outputPath;
-    }
+    protected void serialize(
+            GraphDatabaseService graphDatabase,
+            String outputPath
+    ) throws IOException { }
 
 }
