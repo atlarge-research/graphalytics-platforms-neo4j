@@ -1,19 +1,20 @@
-# Graphalytics Neo4j platform extension
+# Graphalytics Neo4j platform driver
 
-[![Build Status](http://jenkins.tribler.org/buildStatus/icon?job=Graphalytics_Neo4j_master_tester)](http://jenkins.tribler.org/job/Graphalytics_Neo4j_master_tester/)
+Neo4j... (TODO: provide a short description on Neo4j). To execute Graphalytics benchmark on Neo4j, follow the steps in the Graphalytics tutorial on [Running Benchmark](https://github.com/ldbc/ldbc_graphalytics/wiki/Manual%3A-Running-Benchmark) with the Neo4j-specific instructions listed below.
 
+### Obtain the platform driver
+There are two possible ways to obtain the Neo4j platform driver:
 
-## Getting started
+ 1. **Download the (prebuilt) [Neo4j platform driver](http://graphalytics.site/dist/stable/) distribution from our website.
 
-Please refer to the documentation of the Graphalytics core (`graphalytics` repository) for an introduction to using Graphalytics.
+ 2. **Build the platform drivers**: 
+  - Download the source code from this repository.
+  - Execute `mvn clean package` in the root directory (See details in [Software Build](https://github.com/ldbc/ldbc_graphalytics/wiki/Documentation:-Software-Build)).
+  - Extract the distribution from  `graphalytics-{graphalytics-version}-neo4j-{platform-version}.tar.gz`.
 
+### Verify the necessary prerequisites
+The softwares listed below are required by the Neo4j platform driver, which should be properly configured in the cluster environment....
 
-## Neo4j-specific benchmark configuration
-
-The `neo4j` benchmark is run locally on the machine on which Graphalytics is launched. Before launching the benchmark, edit `config/neo4j.properties` and change the following settings:
-
-- `jvm.heap.size.mb`: Set to the amount of heap space (in MB) to allocate to the Neo4j process.
-- `neo4j.db.path`: Set to an appropriate path to store Neo4j databases in.
-
-Other options in the `config/neo4j.properties` file are passed directly to Neo4j. This should be used to set e.g. buffer sizes.
+### Adjust the benchmark configurations
+Adjust the Neo4j configurations in `config/platform.properties`...
 
