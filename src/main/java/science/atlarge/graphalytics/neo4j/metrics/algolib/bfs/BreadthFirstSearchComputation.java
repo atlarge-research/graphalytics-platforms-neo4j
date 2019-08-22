@@ -69,7 +69,7 @@ public class BreadthFirstSearchComputation {
                             "  {write: true, writeProperty: '%s', direction: '%s'}\n" +
                             ")\n" +
                             "YIELD nodeCount, totalCost, loadMillis, evalMillis, writeMillis\n" +
-                            "RETURN nodeCount, totalCost, loadMillis, evalMillis, writeMillis",
+                            "RETURN count(*)",
                     Neo4jConstants.ID_PROPERTY,
                     startVertexId,
                     DISTANCE,
