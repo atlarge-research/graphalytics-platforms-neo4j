@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package science.atlarge.graphalytics.neo4j.metrics.algolib.ssp;
+package science.atlarge.graphalytics.neo4j.metrics.algolib.sssp;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import science.atlarge.graphalytics.domain.algorithms.SingleSourceShortestPathsParameters;
 import science.atlarge.graphalytics.neo4j.ValidationGraphLoader;
-import science.atlarge.graphalytics.neo4j.metrics.algolib.sssp.SingleSourceShortestPathsComputation;
 import science.atlarge.graphalytics.util.graph.PropertyGraph;
 import science.atlarge.graphalytics.validation.algorithms.sssp.SingleSourceShortestPathsOutput;
 import science.atlarge.graphalytics.validation.algorithms.sssp.SingleSourceShortestPathsValidationTest;
