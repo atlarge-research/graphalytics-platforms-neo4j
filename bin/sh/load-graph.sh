@@ -73,7 +73,7 @@ mkdir -p ${OUTPUT_PATH}
 sed "1i VID:ID" ${INPUT_VERTEX_PATH} > ${OUTPUT_PATH}/vertex.csv
 case ${WEIGHTED} in
     "true")
-        sed "1i :START_ID :END_ID weight:DOUBLE" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
+        sed "1i :START_ID :END_ID WEIGHT:DOUBLE" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
         ;;
     "false")
         sed "1i :START_ID :END_ID" ${INPUT_EDGE_PATH} > ${OUTPUT_PATH}/edge.csv
