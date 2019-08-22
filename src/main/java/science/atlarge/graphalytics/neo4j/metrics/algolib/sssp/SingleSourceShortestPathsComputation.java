@@ -73,12 +73,7 @@ public class SingleSourceShortestPathsComputation {
                             "  {write: true, writeProperty: '%s', direction: '%s'}\n" +
                             ")\n" +
                             "YIELD nodeCount, totalCost, loadMillis, evalMillis, writeMillis\n" +
-                            "RETURN\n" +
-                            "  endNode.%s as vertex,\n" +
-                            "  CASE \n" +
-                            "    WHEN totalCost = -1 AND startNode = endNode THEN 0.0\n" +
-                            "    ELSE toFloat(totalCost)\n" +
-                            "  END AS cost",
+                            "RETURN count(*)",
                     Neo4jConstants.ID_PROPERTY,
                     startVertexId,
                     Neo4jConstants.WEIGHT_PROPERTY,
@@ -87,12 +82,6 @@ public class SingleSourceShortestPathsComputation {
                     Neo4jConstants.ID_PROPERTY
             );
             final Result result = graphDatabase.execute(command);
-            while (result.hasNext()) {
-                final Map<String, Object> row = result.next();
-                final long vertex = (long) row.get("vertex");
-                final double cost = (double) row.get("cost");
-                costs.put(vertex, cost >= 0 ? cost : Double.POSITIVE_INFINITY);
-            }
         }
         LOG.debug("- Completed Single Source Shortest Paths algorithm");
         return costs;

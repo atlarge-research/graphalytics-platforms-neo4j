@@ -12,11 +12,13 @@ To run the benchmark, follow the steps in the Graphalytics tutorial on [Running 
 To initialize the benchmark package, run:
 
 ```bash
-./init.sh MY_GRAPH_DIR
+./init.sh MY_GRAPH_DIR NEO4J_DIR IMPLEMENTATION
 ```
 
-where `MY_GRAPH_DIR` should point to the directory of the graphs and the validation data. The default value is `~/graphs`.
+where
 
-Additionally, in `config/platform.properties`:
-* Set the `platform.neo4j.home` value to your Neo4j home directory, e.g., `/home/ubuntu/neo4j`
-* Set the `benchmark.impl` value to `embedded` or `algolib`.
+* `MY_GRAPH_DIR` should point to the directory of the graphs and the validation data. The default value is `~/graphs`.
+* `NEOJ4_DIR` should point to Neo4j's directory. The default value is `~/neo4j`.
+* `IMPLEMENTATION` selects the implementation to use (`embedded` or `algolib`). The default value is `algolib`.
+
+You can later review these configurations are set in `config/benchmark.properties` and `config/platform.properties`.
