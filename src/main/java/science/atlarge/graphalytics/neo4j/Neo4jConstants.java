@@ -31,7 +31,7 @@ public final class Neo4jConstants {
 
     public static final RelationshipType EDGE = RelationshipType.withName("EDGE");
     public static final String ID_PROPERTY = "VID";
-    public static final String WEIGHT_PROPERTY = "WEIGHT";
+    public static final String WEIGHT_PROPERTY = "weight";
 
     //
     // Metric properties
