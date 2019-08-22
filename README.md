@@ -1,18 +1,13 @@
 # Graphalytics Neo4j platform driver
 
-Neo4j... (TODO: provide a short description on Neo4j). To execute Graphalytics benchmark on Neo4j, follow the steps in the Graphalytics tutorial on [Running Benchmark](https://github.com/ldbc/ldbc_graphalytics/wiki/Manual%3A-Running-Benchmark) with the Neo4j-specific instructions listed below.
+Neo4j implementation of the LDBC Graphalytics benchmark. This repository contains two sets of implementations:
 
-### Obtain the platform driver
-There are two possible ways to obtain the Neo4j platform driver:
+* `embedded` uses Neo4j's Java API, available in [embedded mode](https://neo4j.com/docs/java-reference/current/tutorials-java-embedded/)
+* `algolib` use the [Neo4j Graph Algorithms Library](https://neo4j.com/docs/graph-algorithms/current/)
 
- 1. **Download the (prebuilt) [Neo4j platform driver](http://graphalytics.site/dist/stable/) distribution from our website.
+To run the benchmark, follow the steps in the Graphalytics tutorial on [Running Benchmark](https://github.com/ldbc/ldbc_graphalytics/wiki/Manual%3A-Running-Benchmark) with the Neo4j-specific instructions listed below.
 
- 2. **Build the platform drivers**: 
-- Download the source code from this repository.
-- Execute `mvn clean package` in the root directory (See details in [Software Build](https://github.com/ldbc/ldbc_graphalytics/wiki/Documentation:-Software-Build)).
-- Extract the distribution from  `graphalytics-{graphalytics-version}-neo4j-{platform-version}.tar.gz`.
-
-### Configure the benchmark
+### Configuring and running the benchmark
 
 To initialize the benchmark package, run:
 
