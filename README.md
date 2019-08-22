@@ -22,6 +22,6 @@ To initialize the benchmark package, run:
 
 where `MY_GRAPH_DIR` should point to the directory of the graphs and the validation data. The default value is `~/graphs`.
 
-Additionally:
-* In `config/platform.properties`, set the `platform.neo4j.home` value.
-* In `config/benchmark.properties`, set the `benchmark.impl` value.
+Additionally, in `config/platform.properties`:
+* Set the `platform.neo4j.home` value to your Neo4j home directory, e.g., `/home/ubuntu/neo4j`
+* Set the `benchmark.impl` value to `embedded` or `algolib`.
