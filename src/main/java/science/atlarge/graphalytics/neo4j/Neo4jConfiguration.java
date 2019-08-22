@@ -36,7 +36,7 @@ public final class Neo4jConfiguration {
 
     private static final String BENCHMARK_PROPERTIES_FILE = "benchmark.properties";
     private static final String HOME_PATH_KEY = "platform.neo4j.home";
-    private static final String BENCHMARK_IMPL_KEY = "benchmark.impl";
+    private static final String BENCHMARK_IMPL_KEY = "platform.impl";
 
     public enum BenchmarkImplementation {
         ALGOLIB,
